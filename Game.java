@@ -9,6 +9,7 @@ public class Game
 	private Dealer de;
 	private int totalDealerValue;
 	private int totalPlayerValue;
+	private boolean gameState;
 	
 	public Game()
 	{
@@ -19,6 +20,7 @@ public class Game
 		playerName = " ";
 		totalDealerValue = 0;
 		totalPlayerValue = 0;
+		gameState = true;
 	}
 	
 	public static void main(String[] args)
@@ -148,6 +150,7 @@ public class Game
 		else
 		{
 			System.out.println("You lost this round!");
+			gameState = false;
 		}
 		
 			
@@ -155,25 +158,32 @@ public class Game
 	
 	public void dealerTurn()
 	{
+		boolean checker = determine();
+		/*if(checker == true) //when the dealer is greater than the player
+		{
+			gameState = false;
+			System.out.println("Game Ended");
+		}
+			*/
 		
-		if(de.checkHitOrStand() == true)
+		if(de.checkHitOrStand() == true) //gameState == true)
 		{
 			System.out.println("The dealer decided to hit!");
 			Card dealHit = d.dealCard();
 			dealHit.show();
 			totalDealerValue = de.hit(dealHit);
 		}
-		else
+		else if(de.checkHitOrStand() == false)//gameState == true)
 		{
 			System.out.println("The dealer decided to stand!");
 			de.stand();
 		}
 		
-		determine();
 	}
 	
-	public void determine()
+	public boolean determine()
 	{
+		boolean greater = false;	//for the dealer
 		totalPlayerValue = p.getPlayerAmount();
 		
 		if(totalDealerValue <= 21 && totalPlayerValue <=21)
@@ -181,19 +191,34 @@ public class Game
 			if(totalDealerValue > totalPlayerValue)
 			{
 				System.out.println("You Lost!");
+				greater = true;
+			
 			}
 			
 			else if(totalDealerValue < totalPlayerValue)
 			{
 				System.out.println("You won!");
+				greater = false;
+				
 			}
 			
 			else if(totalDealerValue == totalPlayerValue)
 				System.out.println("Its a push!!!");
 		}
 		
+		gameState = false;
+		
+		return greater;
+		
 	}
+	
 }
+
+
+
+
+
+
 
 
 
