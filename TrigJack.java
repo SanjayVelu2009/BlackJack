@@ -162,20 +162,24 @@ class Instructions extends JPanel implements ActionListener
     private JScrollPane instructions;
     private JSlider scroll;
     private JTextArea text;
+    private JLabel insTitle;
 
     public Instructions(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
+		insTitle = new JLabel("Instructions");
+		add(insTitle,BorderLayout.NORTH);
+		
         cards = cardsIn;
         trigHolder = trigHolderIn;
 
-        setLayout(null);
+        setLayout(new BorderLayout());
         setBackground(new Color(30, 93, 82));
 		
 		home = new JButton("Home");
 		home.setLocation(300, 700);
 		home.setSize(200, 60);
 		home.addActionListener(this);
-		add(home);
+		add(home,BorderLayout.SOUTH);
 		
 		text = new JTextArea(60,50);
 		text.setText("");
@@ -203,6 +207,7 @@ class Highscores extends JPanel implements ActionListener
 	private TrigJackHolder trigHolder;
     private CardLayout cards;
     private JButton home;
+    
     
     public Highscores(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
