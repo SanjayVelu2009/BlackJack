@@ -160,6 +160,8 @@ class Instructions extends JPanel implements ActionListener
     private CardLayout cards;
     private JButton home;
     private JScrollPane instructions;
+    private JSlider scroll;
+    private JTextArea text;
 
     public Instructions(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
@@ -167,13 +169,24 @@ class Instructions extends JPanel implements ActionListener
         trigHolder = trigHolderIn;
 
         setLayout(null);
-        setBackground(Color.CYAN);
+        setBackground(new Color(30, 93, 82));
 		
 		home = new JButton("Home");
 		home.setLocation(300, 700);
 		home.setSize(200, 60);
 		home.addActionListener(this);
 		add(home);
+		
+		text = new JTextArea(60,50);
+		text.setText("");
+		text.setWrapStyleWord(true);
+        text.setLineWrap(true);
+        text.setEditable(false);
+        
+		instructions = new JScrollPane(text);
+		instructions.setLocation(50, 50);
+		instructions.setSize(700, 600);
+		add(instructions);
     }
     
     public void actionPerformed(ActionEvent evt)
