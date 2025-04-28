@@ -2,6 +2,8 @@
 // Main class with all the panels
 // Game logic class and text file class will be called in
 
+
+//Imports for the JFrame/Java Elements, etc.
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -44,70 +46,74 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 
-public class TrigJack
+public class TrigJack //Class header
 {
-    public TrigJack()
+    public TrigJack() //Constructor
     {
     }
 
-    public static void main(String[] args)
+    public static void main(String[] args) //main
     {
-        TrigJack tj = new TrigJack();
-        tj.runIt();
+        TrigJack tj = new TrigJack(); // create instance of class
+        tj.runIt(); //call run method
     }
 
-    public void runIt()
+    public void runIt() //run method
     {
-        JFrame frame = new JFrame("TrigJack");
-        frame.setSize(1000, 800);
+        JFrame frame = new JFrame("TrigJack"); //create JFrame
+        frame.setSize(1000, 800); // Frame size is 1000 x 800
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocation(0, 50);
         frame.setResizable(true);
 
-        TrigJackHolder tjh = new TrigJackHolder();
-        frame.getContentPane().add(tjh);
+        TrigJackHolder tjh = new TrigJackHolder(); //Create Panel Holder class
+        frame.getContentPane().add(tjh); //Add Panel holder to the JFrame
         frame.setVisible(true);
     }
 }
 
-class ButtonStyler
+class ButtonStyler // Class to get colored buttons
 {
-    public void styleButton(JButton button)
+    public void styleButton(JButton button) //Method (accepts a JButton as a parameter)
     {
-        button.setBackground(new Color(255, 215, 0));
-        button.setForeground(new Color(0, 0, 0));
-        button.setFont(new Font("DialogInput", Font.BOLD, 18));
+        button.setBackground(new Color(255, 215, 0)); //Set Background of the accepted Button
+        button.setForeground(new Color(0, 0, 0)); //Set foreground of the accepted Button
+        button.setFont(new Font("DialogInput", Font.BOLD, 18)); //Set fond
         button.setFocusPainted(false);
         button.setOpaque(true);
     }
 }
 
-class TrigJackHolder extends JPanel
+class TrigJackHolder extends JPanel //Panel Holder Class
 {
     public TrigJackHolder()
     {
-        CardLayout card = new CardLayout();
-        setLayout(card);
+        CardLayout card = new CardLayout(); //Create Card Layout
+        setLayout(card); //Set Layout to be card layout
 
-        StartMenu sm = new StartMenu(this, card);
+		//Create the cards
+        StartMenu sm = new StartMenu(this, card); 
         Instructions ins = new Instructions(this, card);
         Highscores hs = new Highscores(this, card);
         PlayMenu pm = new PlayMenu(this, card);
         Problem prob = new Problem(this, card);
         Solution sol = new Solution(this, card);
 
+		//Add the cards to the Card Layout
         add(sm, "Start");
         add(ins, "Instructions");
         add(hs, "Highscores");
         add(pm, "Playing");
         add(prob, "Problem");
         add(sol, "Solution");
-        card.show(this, "Start");
+        card.show(this, "Start"); //Show the Start Panel
     }
 }
 
-class StartMenu extends JPanel implements ActionListener
+class StartMenu extends JPanel implements ActionListener //Start Menu Class
 {
+	
+	//FV for the UI elements & the classes like the button styler and the panel holder
     private TrigJackHolder trigHolder;
     private CardLayout cards;
     private JButton playButton;
@@ -123,30 +129,33 @@ class StartMenu extends JPanel implements ActionListener
         trigHolder = trigHolderIn;
         cards = cardsIn;
 
-        setLayout(null);
+        setLayout(null); //Start Menu layout is null
 
+		//load image for background using try-catch
         try
         {
             backgroundImage = ImageIO.read(new File("background.jpeg"));
         }
-        catch (IOException e)
+        catch (IOException e) //If image isn't found on user's system, set background to green
         {
             System.err.println("Background image not found: " + e.getMessage());
             setBackground(new Color(53, 101, 77));
         }
 
 		
+		//JLabel for the title
 		titleLabel = new JLabel("TRIGJACK");
 		titleLabel.setFont(new Font("DialogInput", Font.BOLD, 90));
 		titleLabel.setForeground(new Color(255, 215, 0));
 		titleLabel.setBounds(260, 50, 800, 100);
 		add(titleLabel);
 
+		//Buttons for Play, Instructions, High Scores, & Quit
         playButton = new JButton("Play");
         playButton.setBounds(390, 300, 200, 60);
-        styler.styleButton(playButton);
-        playButton.addActionListener(this);
-        add(playButton);
+        styler.styleButton(playButton); //Call the styler class to give the button the gold outline
+        playButton.addActionListener(this); //Add action Listener
+        add(playButton); //Add the button to the panel
 
         instructionsButton = new JButton("Instructions");
         instructionsButton.setBounds(390, 380, 200, 60);
@@ -167,19 +176,20 @@ class StartMenu extends JPanel implements ActionListener
         add(quitButton);
     }
 
-    public void paintComponent(Graphics g)
+    public void paintComponent(Graphics g) //Draw the image using paintComponent
     {
         super.paintComponent(g);
-        if (backgroundImage != null)
+        if (backgroundImage != null) //Checks if there is a background image
         {
-            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this); //Crop the iamge for the pane
         }
     }
 
-    public void actionPerformed(ActionEvent evt)
+    public void actionPerformed(ActionEvent evt) // Checks if the user clicks the button using Action Performed
     {
-		Object src = evt.getSource();
+		Object src = evt.getSource(); //Checks what button the user clicks on using getSource()
 
+		//If the user clicks on a button the program goes to that corresponding card
 		if (src == playButton)
 		{
 			cards.show(trigHolder, "Playing");
@@ -192,14 +202,14 @@ class StartMenu extends JPanel implements ActionListener
 		{
 			cards.show(trigHolder, "Highscores");
 		}
-		else if (src == quitButton)
+		else if (src == quitButton) // If user clicks the "Quit" button then the program exits
 		{
 			System.exit(1);
 		}
 	}
 }
 
-class Instructions extends JPanel implements ActionListener
+class Instructions extends JPanel implements ActionListener // Intructions Panel
 {
     private TrigJackHolder trigHolder;
     private CardLayout cards;
@@ -216,12 +226,14 @@ class Instructions extends JPanel implements ActionListener
         setLayout(null);
         setBackground(new Color(53, 101, 77));
 
+		//Home button that returns the user to the Start panel
         home = new JButton("Home");
         home.setBounds(390, 700, 200, 60);
         styler.styleButton(home);
         home.addActionListener(this);
         add(home);
 
+		//JTextArea that stores the instructions for the game
         text = new JTextArea(60, 50);
         text.setText("");
         text.setWrapStyleWord(true);
@@ -233,7 +245,7 @@ class Instructions extends JPanel implements ActionListener
         add(instructions);
     }
 
-    public void actionPerformed(ActionEvent evt)
+    public void actionPerformed(ActionEvent evt) //Checks if user clicks the Home button and returns them home
     {
         if (evt.getActionCommand().equals("Home"))
         {
@@ -242,7 +254,7 @@ class Instructions extends JPanel implements ActionListener
     }
 }
 
-class Highscores extends JPanel implements ActionListener
+class Highscores extends JPanel implements ActionListener //High Scores panel
 {
     private TrigJackHolder trigHolder;
     private CardLayout cards;
@@ -273,7 +285,7 @@ class Highscores extends JPanel implements ActionListener
     }
 }
 
-class PlayMenu extends JPanel
+class PlayMenu extends JPanel //Game Panel where the game is actually played
 {
     public PlayMenu(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
@@ -287,7 +299,7 @@ class PlayMenu extends JPanel
     }
 }
 
-class Problem extends JPanel
+class Problem extends JPanel //Problem Panel that will have the problems for the user to solve
 {
     public Problem(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
@@ -301,7 +313,7 @@ class Problem extends JPanel
     }
 }
 
-class Solution extends JPanel
+class Solution extends JPanel //Solution Panel that will show up if the user chooses the wrong answer
 {
     public Solution(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
