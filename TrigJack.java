@@ -2,8 +2,7 @@
 // Main class with all the panels
 // Game logic class and text file class will be called in
 
-
-//Imports for the JFrame/Java Elements, etc.
+// Imports for the JFrame/Java Elements, etc.
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -44,82 +43,76 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import java.io.FileWriter;
 
-
-public class TrigJack //Class header
+public class TrigJack
 {
-    public TrigJack() //Constructor
+    public TrigJack() {}
+
+    public static void main(String[] args)
     {
+        TrigJack tj = new TrigJack();
+        tj.runIt();
     }
 
-    public static void main(String[] args) //main
+    public void runIt()
     {
-        TrigJack tj = new TrigJack(); // create instance of class
-        tj.runIt(); //call run method
-    }
-
-    public void runIt() //run method
-    {
-        JFrame frame = new JFrame("TrigJack"); //create JFrame
-        frame.setSize(1000, 800); // Frame size is 1000 x 800
+        JFrame frame = new JFrame("TrigJack");
+        frame.setSize(1000, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocation(0, 50);
         frame.setResizable(true);
 
-        TrigJackHolder tjh = new TrigJackHolder(); //Create Panel Holder class
-        frame.getContentPane().add(tjh); //Add Panel holder to the JFrame
+        TrigJackHolder tjh = new TrigJackHolder();
+        frame.getContentPane().add(tjh);
         frame.setVisible(true);
     }
 }
 
-class ButtonStyler // Class to get colored buttons
+class ButtonStyler
 {
-    public void styleButton(JButton button) //Method (accepts a JButton as a parameter)
+    public void styleButton(JButton button)
     {
-        button.setBackground(new Color(255, 215, 0)); //Set Background of the accepted Button
-        button.setForeground(new Color(0, 0, 0)); //Set foreground of the accepted Button
-        button.setFont(new Font("DialogInput", Font.BOLD, 18)); //Set fond
+        button.setBackground(new Color(255, 215, 0));
+        button.setForeground(Color.BLACK);
+        button.setFont(new Font("DialogInput", Font.BOLD, 18));
         button.setFocusPainted(false);
         button.setOpaque(true);
     }
 }
 
-class TrigJackHolder extends JPanel //Panel Holder Class
+class TrigJackHolder extends JPanel
 {
     public TrigJackHolder()
     {
-        CardLayout card = new CardLayout(); //Create Card Layout
-        setLayout(card); //Set Layout to be card layout
+        CardLayout card = new CardLayout();
+        setLayout(card);
 
-		//Create the cards
-        StartMenu sm = new StartMenu(this, card); 
+        StartMenu sm = new StartMenu(this, card);
         Instructions ins = new Instructions(this, card);
         Highscores hs = new Highscores(this, card);
         PlayMenu pm = new PlayMenu(this, card);
         Problem prob = new Problem(this, card);
         Solution sol = new Solution(this, card);
+        Names nam = new Names(this, card);
 
-		//Add the cards to the Card Layout
         add(sm, "Start");
         add(ins, "Instructions");
         add(hs, "Highscores");
         add(pm, "Playing");
         add(prob, "Problem");
         add(sol, "Solution");
-        card.show(this, "Start"); //Show the Start Panel
+        add(nam, "Name");
+
+        card.show(this, "Start");
     }
 }
 
-class StartMenu extends JPanel implements ActionListener //Start Menu Class
+class StartMenu extends JPanel implements ActionListener
 {
-	
-	//FV for the UI elements & the classes like the button styler and the panel holder
     private TrigJackHolder trigHolder;
     private CardLayout cards;
-    private JButton playButton;
-    private JButton instructionsButton;
-    private JButton highScoresButton;
-    private JButton quitButton;
+    private JButton playButton, instructionsButton, highScoresButton, quitButton;
     private JLabel titleLabel;
     private Image backgroundImage;
     private ButtonStyler styler = new ButtonStyler();
@@ -129,33 +122,29 @@ class StartMenu extends JPanel implements ActionListener //Start Menu Class
         trigHolder = trigHolderIn;
         cards = cardsIn;
 
-        setLayout(null); //Start Menu layout is null
+        setLayout(null);
 
-		//load image for background using try-catch
         try
         {
             backgroundImage = ImageIO.read(new File("background.jpeg"));
         }
-        catch (IOException e) //If image isn't found on user's system, set background to green
+        catch (IOException e)
         {
             System.err.println("Background image not found: " + e.getMessage());
             setBackground(new Color(53, 101, 77));
         }
 
-		
-		//JLabel for the title
-		titleLabel = new JLabel("TRIGJACK");
-		titleLabel.setFont(new Font("DialogInput", Font.BOLD, 90));
-		titleLabel.setForeground(new Color(255, 215, 0));
-		titleLabel.setBounds(260, 50, 800, 100);
-		add(titleLabel);
+        titleLabel = new JLabel("TRIGJACK");
+        titleLabel.setFont(new Font("DialogInput", Font.BOLD, 90));
+        titleLabel.setForeground(new Color(255, 215, 0));
+        titleLabel.setBounds(260, 50, 800, 100);
+        add(titleLabel);
 
-		//Buttons for Play, Instructions, High Scores, & Quit
         playButton = new JButton("Play");
         playButton.setBounds(390, 300, 200, 60);
-        styler.styleButton(playButton); //Call the styler class to give the button the gold outline
-        playButton.addActionListener(this); //Add action Listener
-        add(playButton); //Add the button to the panel
+        styler.styleButton(playButton);
+        playButton.addActionListener(this);
+        add(playButton);
 
         instructionsButton = new JButton("Instructions");
         instructionsButton.setBounds(390, 380, 200, 60);
@@ -168,7 +157,7 @@ class StartMenu extends JPanel implements ActionListener //Start Menu Class
         styler.styleButton(highScoresButton);
         highScoresButton.addActionListener(this);
         add(highScoresButton);
-        
+
         quitButton = new JButton("Quit");
         quitButton.setBounds(390, 540, 200, 60);
         styler.styleButton(quitButton);
@@ -176,46 +165,46 @@ class StartMenu extends JPanel implements ActionListener //Start Menu Class
         add(quitButton);
     }
 
-    public void paintComponent(Graphics g) //Draw the image using paintComponent
+    public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
-        if (backgroundImage != null) //Checks if there is a background image
+        if (backgroundImage != null)
         {
-            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this); //Crop the iamge for the pane
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
         }
     }
 
-    public void actionPerformed(ActionEvent evt) // Checks if the user clicks the button using Action Performed
+    public void actionPerformed(ActionEvent evt)
     {
-		Object src = evt.getSource(); //Checks what button the user clicks on using getSource()
+        Object src = evt.getSource();
 
-		//If the user clicks on a button the program goes to that corresponding card
-		if (src == playButton)
-		{
-			cards.show(trigHolder, "Playing");
-		}
-		else if (src == instructionsButton)
-		{
-			cards.show(trigHolder, "Instructions");
-		}
-		else if (src == highScoresButton)
-		{
-			cards.show(trigHolder, "Highscores");
-		}
-		else if (src == quitButton) // If user clicks the "Quit" button then the program exits
-		{
-			System.exit(1);
-		}
-	}
+        if (src == playButton)
+        {
+            cards.show(trigHolder, "Name");
+        }
+        else if (src == instructionsButton)
+        {
+            cards.show(trigHolder, "Instructions");
+        }
+        else if (src == highScoresButton)
+        {
+            cards.show(trigHolder, "Highscores");
+        }
+        else if (src == quitButton)
+        {
+            System.exit(1);
+        }
+    }
 }
 
-class Instructions extends JPanel implements ActionListener // Intructions Panel
+class Instructions extends JPanel implements ActionListener
 {
     private TrigJackHolder trigHolder;
     private CardLayout cards;
     private JButton home;
     private JScrollPane instructions;
     private JTextArea text;
+    private Image backgroundImage1;
     private ButtonStyler styler = new ButtonStyler();
 
     public Instructions(TrigJackHolder trigHolderIn, CardLayout cardsIn)
@@ -224,18 +213,60 @@ class Instructions extends JPanel implements ActionListener // Intructions Panel
         trigHolder = trigHolderIn;
 
         setLayout(null);
-        setBackground(new Color(53, 101, 77));
 
-		//Home button that returns the user to the Start panel
+        try
+        {
+            backgroundImage1 = ImageIO.read(new File("instructions.jpeg"));
+        }
+        catch (IOException e)
+        {
+            System.err.println("Background image not found: " + e.getMessage());
+            setBackground(new Color(53, 0, 77));
+        }
+
         home = new JButton("Home");
         home.setBounds(390, 700, 200, 60);
         styler.styleButton(home);
         home.addActionListener(this);
         add(home);
 
-		//JTextArea that stores the instructions for the game
-        text = new JTextArea(60, 50);
-        text.setText("");
+        text = new JTextArea(30, 50);
+        text.setText("The game aims to bet against the dealer to see whose hand is closest to 21.\n\n" +
+            "Cards:\n" +
+            "- 2–10: Worth face value.\n" +
+            "- J, Q, K: Worth 10.\n" +
+            "- A: Worth 1 or 11.\n\n" +
+            "Gameplay:\n" +
+            "- Minimum bet: $10.\n" +
+            "- Start with $1000. \n" +
+            "- Players and dealer are each dealt two cards (one of dealer’s face-down).\n\n" +
+            "Blackjack:\n" +
+            "- If player gets 21 and dealer doesn't, player wins 1.5x their bet.\n\n" +
+            "Insurance:\n" +
+            "- Available if dealer shows an Ace.\n" +
+            "- Win 2x insurance bet if dealer has Blackjack.\n" +
+            "- Max insurance bet: 50% of original bet.\n\n" +
+            "Example:\n" +
+            "- Bet $10, Insurance $5. Dealer Blackjack → break even.\n\n" +
+            "Player Options:\n" +
+            "- Hit: Draw another card.\n" +
+            "- Stand: Keep current hand.\n" +
+            "- Split: Divide two matching cards into two hands.\n" +
+            "- Double Down: Double bet, draw one card, and stand.\n\n" +
+            "Dealer Rules:\n" +
+            "- Dealer reveals second card after player.\n" +
+            "- Dealer hits or stands according to standard rules.\n\n" +
+            "Trig Challenge on Bust:\n" +
+            "- Correct answer: Lose half bet.\n" +
+            "- Incorrect answer: Lose full bet.\n" +
+            "- Wrong? Step-by-step solution shown.\n\n" +
+            "Winning & Losing:\n" +
+            "- Start: $1000.\n" +
+            "- Goal: Reach $10,000 to win.\n" +
+            "- Lose: Bankrupt.\n" +
+            "- Final Challenge if bankrupt.\n\n" +
+            "High Scores:\n" +
+            "- The lowest number of rounds to reach $10000 is on the leaderboard!\n\n");
         text.setWrapStyleWord(true);
         text.setLineWrap(true);
         text.setEditable(false);
@@ -245,16 +276,25 @@ class Instructions extends JPanel implements ActionListener // Intructions Panel
         add(instructions);
     }
 
-    public void actionPerformed(ActionEvent evt) //Checks if user clicks the Home button and returns them home
+    public void actionPerformed(ActionEvent evt)
     {
         if (evt.getActionCommand().equals("Home"))
         {
             cards.show(trigHolder, "Start");
         }
     }
+
+    public void paintComponent(Graphics g)
+    {
+        super.paintComponent(g);
+        if (backgroundImage1 != null)
+        {
+            g.drawImage(backgroundImage1, 0, 0, getWidth(), getHeight(), this);
+        }
+    }
 }
 
-class Highscores extends JPanel implements ActionListener //High Scores panel
+class Highscores extends JPanel implements ActionListener
 {
     private TrigJackHolder trigHolder;
     private CardLayout cards;
@@ -285,21 +325,184 @@ class Highscores extends JPanel implements ActionListener //High Scores panel
     }
 }
 
-class PlayMenu extends JPanel //Game Panel where the game is actually played
+class Names extends JPanel implements ActionListener
 {
-    public PlayMenu(TrigJackHolder trigHolderIn, CardLayout cardsIn)
+    private JTextField name;
+    private JLabel nameLabel;
+    private JButton play;
+    private TrigJackHolder trigHolder;
+    private CardLayout cards;
+    private ButtonStyler styler = new ButtonStyler();
+    private Image backgroundImage1;
+    private JCheckBox understand;
+    private JButton back;
+
+    public Names(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
+        try
+        {
+            backgroundImage1 = ImageIO.read(new File("instructions.jpeg"));
+        }
+        catch (IOException e)
+        {
+            System.err.println("Background image not found: " + e.getMessage());
+            setBackground(new Color(53, 0, 77));
+        }
+
+        cards = cardsIn;
+        trigHolder = trigHolderIn;
+
         setLayout(null);
         setBackground(new Color(53, 101, 77));
 
-        JLabel label = new JLabel("Play Menu Page");
-        label.setBounds(350, 350, 200, 30);
-        label.setForeground(Color.WHITE);
-        add(label);
+        nameLabel = new JLabel("Enter Your Name:");
+        nameLabel.setForeground(Color.WHITE);
+        nameLabel.setBounds(340, 300, 300, 30);
+        nameLabel.setFont(new Font("DialogInput", Font.BOLD, 18));
+        add(nameLabel);
+
+        name = new JTextField();
+        name.setBounds(340, 340, 300, 30);
+        add(name);
+        
+        understand = new JCheckBox("I have read and understood the instructions");
+        understand.setForeground(Color.WHITE);
+        understand.setBounds(340, 400, 400, 30);
+        understand.setFont(new Font("DialogInput", Font.BOLD, 12));
+        add(understand);
+
+		back = new JButton("Back");
+		back.setBounds(270, 700, 200, 60);
+		styler.styleButton(back);
+		back.addActionListener(this);
+		add(back);
+
+        play = new JButton("Play Game");
+        play.setBounds(520, 700, 200, 60);
+        styler.styleButton(play);
+        play.addActionListener(this);
+        add(play);
+    }
+
+    public void actionPerformed(ActionEvent evt)
+    {
+        if (evt.getActionCommand().equals("Play Game"))
+        {
+            String playerName = name.getText().trim();
+            if (playerName.isEmpty() && understand.isSelected() == false)
+            {
+                nameLabel.setText("Name required to play!");
+                nameLabel.setForeground(Color.RED);
+            }
+            else if (understand.isSelected() == false)
+            {
+				nameLabel.setText("Please review the instructions!");
+				nameLabel.setForeground(Color.RED);
+			}
+            else
+            {
+                saveNameToFile(playerName);
+                nameLabel.setText("Enter Your Name:");
+                nameLabel.setForeground(Color.WHITE);
+                cards.show(trigHolder, "Playing");
+            }
+        }
+        else if (evt.getActionCommand().equals("Back"))
+        {
+			cards.show(trigHolder, "Start");
+		}
+    }
+
+    private void saveNameToFile(String name)
+    {
+        try (FileWriter writer = new FileWriter("players.txt", true))
+        {
+            writer.write(name + "\n");
+        }
+        catch (IOException e)
+        {
+            System.err.println("Error saving name: " + e.getMessage());
+        }
+    }
+
+    public void paintComponent(Graphics g)
+    {
+        super.paintComponent(g);
+        if (backgroundImage1 != null)
+        {
+            g.drawImage(backgroundImage1, 0, 0, getWidth(), getHeight(), this);
+        }
     }
 }
 
-class Problem extends JPanel //Problem Panel that will have the problems for the user to solve
+class PlayMenu extends JPanel
+{
+	private JSlider betting;
+	private JMenu menuOpt;
+	private JMenuBar menuBar;
+	private JMenuItem split;
+	private JMenuItem doubleDown;
+	private JMenuItem insure;
+	private JButton allIn;
+	private JButton hit;
+	private JButton stand;
+    private TrigJackHolder trigHolder;
+    private CardLayout cards;
+    private ButtonStyler styler = new ButtonStyler();
+
+    public PlayMenu(TrigJackHolder trigHolderIn, CardLayout cardsIn)
+    {
+           
+        setLayout(new BorderLayout());
+        setBackground(new Color(53, 101, 77));
+		
+		JPanel northPanel = new JPanel();
+		northPanel.setLayout(new BorderLayout());
+		add(northPanel, BorderLayout.NORTH);
+		
+		JPanel westPanel = new JPanel();
+		westPanel.setLayout(new BorderLayout());
+		add(westPanel, BorderLayout.WEST);
+		
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new GridLayout(2,1));
+		add(buttonPanel, BorderLayout.WEST);
+	
+        betting = new JSlider(0,2000,0);
+        betting.setMajorTickSpacing(200);
+	    betting.setPaintLabels(true);
+	    betting.setFont(new Font("Serif", Font.PLAIN,15));
+	    betting.setOrientation(JSlider.HORIZONTAL);
+		
+		JMenuItem insure = new JMenuItem("insurance");
+		JMenuItem doubleDown = new JMenuItem("double down");
+		JMenuItem split = new JMenuItem("split");
+		
+		menuOpt = new JMenu("Options");
+		
+		menuOpt.add(insure);
+		menuOpt.add(doubleDown);
+		menuOpt.add(split);
+		
+		menuBar = new JMenuBar();
+		menuBar.add(menuOpt);
+		
+		
+		hit = new JButton("HIT");
+		styler.styleButton(hit);
+		stand = new JButton("STAND");
+		styler.styleButton(stand);
+		
+		buttonPanel.add(hit);
+		buttonPanel.add(stand);
+		
+		add(betting,BorderLayout.SOUTH);
+		add(menuBar,BorderLayout.NORTH);
+		
+    }
+}
+
+class Problem extends JPanel
 {
     public Problem(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
@@ -313,7 +516,7 @@ class Problem extends JPanel //Problem Panel that will have the problems for the
     }
 }
 
-class Solution extends JPanel //Solution Panel that will show up if the user chooses the wrong answer
+class Solution extends JPanel
 {
     public Solution(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
