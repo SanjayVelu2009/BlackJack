@@ -1,3 +1,4 @@
+
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -24,31 +25,6 @@ import javax.imageio.ImageIO;
 
 public class Deck
 {
-	public Deck()
-	{
-	}
-	
-	public static void main(String[] args)
-	{
-		Deck df = new Deck();
-		df.runIt();
-	}
-	
-	public void runIt()
-	{
-		JFrame frame = new JFrame("Deck");
-		frame.setSize(800, 800);				
-		frame.setDefaultCloseOperation(frame.EXIT_ON_CLOSE); 
-		frame.setLocation(0,50);
-		frame.setResizable(true);
-		DeckPanel dp = new DeckPanel(); 		
-		frame.getContentPane().add(dp);		
-		frame.setVisible(true);		
-	}
-}
-class DeckPanel extends JPanel
-{
-	
 	private Card[] cardStack = new Card[52];
 		
 	private int topCard;
@@ -57,17 +33,18 @@ class DeckPanel extends JPanel
 	
 	private String cardName;
 	
+	private String[] nameStack = {"1H.jpg","2H.jpg","3H.jpg","4H.jpg","5H.jpg","6H.jpg","7H.jpg","8H.jpg","9H.jpg","10H.jpg","11H.jpg","12H.jpg","13H.jpg","1C.jpg","2C.jpg","3C.jpg","4C.jpg","5C.jpg","6C.jpg","7C.jpg","8C.jpg","9C.jpg","10C.jpg","11C.jpg","12C.jpg","13C.jpg"
+							+"1D.jpg","2D.jpg","3D.jpg","4D.jpg","5D.jpg","6D.jpg","7D.jpg","8D.jpg","9D.jpg","10D.jpg","11D.jpg","12D.jpg","13D.jpg","1S.jpg","2S.jpg","3S.jpg","4S.jpg","5S.jpg","6S.jpg","7S.jpg","8S.jpg","9S.jpg","10S.jpg","11S.jpg","12S.jpg","13S.jpg"};
+		
 	
-	public DeckPanel()
+	
+	public Deck()
 	{
 		topCard = 0;
 		initializeDeck();
 	}
 	
-	public static void main(String[] args)
-	{
-		DeckPanel testDeck = new DeckPanel();
-	}
+	
 		
 	public void initializeDeck()
 	{
@@ -101,9 +78,8 @@ class DeckPanel extends JPanel
 			cardStack[cardIndex++] = spadeCard;
 		}
 		
-		String[] nameStack = {"1H.jpg","2H.jpg","3H.jpg","4H.jpg","5H.jpg","6H.jpg","7H.jpg","8H.jpg","9H.jpg","10H.jpg","11H.jpg","12H.jpg","13H.jpg","1C.jpg","2C.jpg","3C.jpg","4C.jpg","5C.jpg","6C.jpg","7C.jpg","8C.jpg","9C.jpg","10C.jpg","11C.jpg","12C.jpg","13C.jpg"
-							+"1D.jpg","2D.jpg","3D.jpg","4D.jpg","5D.jpg","6D.jpg","7D.jpg","8D.jpg","9D.jpg","10D.jpg","11D.jpg","12D.jpg","13D.jpg","1S.jpg","2S.jpg","3S.jpg","4S.jpg","5S.jpg","6S.jpg","7S.jpg","8S.jpg","9S.jpg","10S.jpg","11S.jpg","12S.jpg","13S.jpg"};
-		shuffleDeckAndImage(nameStack);
+		
+		shuffleDeckAndImage();
 	}
 	
 	public  void showDeck()
@@ -114,7 +90,7 @@ class DeckPanel extends JPanel
 		}
 	}
 	
-	public void shuffleDeckAndImage(String[] nameStack)
+	public void shuffleDeckAndImage()
 	{
 		int b;
 		String swapImage = "";
@@ -144,13 +120,13 @@ class DeckPanel extends JPanel
 			System.out.println(nameStack[a]);
 		}
 		
-		generateImage(nameStack);
+		//generateImage();
 		
 	}
 	
-	public void generateImage(String[] nameStack)
+	public void generateImage(int i)
 	{
-		cardName = nameStack[0];
+		cardName = nameStack[i];
 		
 		try
 		{
@@ -163,16 +139,7 @@ class DeckPanel extends JPanel
 		}
 	}
 			
-	public void paintComponent(Graphics g)
-	{
-		super.paintComponent(g);
-		if (cardImage != null)
-		{
-			g.drawImage(cardImage, 0, 0, 200, 300, this);
-		}
-		
-	}
-	
+
 	public Card dealCard()
 	{
 		Card deal = cardStack[topCard];
