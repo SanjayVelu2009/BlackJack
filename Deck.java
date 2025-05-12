@@ -1,12 +1,64 @@
-public class Deck 
+import java.awt.Graphics;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.CardLayout;
+
+import javax.swing.JFrame;	
+import javax.swing.JPanel;
+
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
+
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+
+
+public class Deck
+{
+	public Deck()
+	{
+	}
+	
+	public static void main(String[] args)
+	{
+		Deck df = new Deck();
+		df.runIt();
+	}
+	
+	public void runIt()
+	{
+		JFrame frame = new JFrame("Deck");
+		frame.setSize(800, 800);				
+		frame.setDefaultCloseOperation(frame.EXIT_ON_CLOSE); 
+		frame.setLocation(0,50);
+		frame.setResizable(true);
+		DeckPanel dp = new DeckPanel(); 		
+		frame.getContentPane().add(dp);		
+		frame.setVisible(true);		
+	}
+}
+class DeckPanel extends JPanel
 {
 	
 	private Card[] cardStack = new Card[52];
 		
 	private int topCard;
 	
+	private Image cardImage;
 	
-	public Deck()
+	private String cardName;
+	
+	
+	public DeckPanel()
 	{
 		topCard = 0;
 		
@@ -14,18 +66,13 @@ public class Deck
 	
 	public static void main(String[] args)
 	{
-		Deck testDeck = new Deck();
+		DeckPanel testDeck = new DeckPanel();
 		testDeck.runIt();
-
-		
 	}
 		
 	public void runIt()
 	{
-		initializeDeck();
-		
-		
-		
+		initializeDeck();		
 	}
 	
 	public void initializeDeck()
@@ -79,7 +126,6 @@ public class Deck
 		String swapImage = "";
 		
 		
-		
 		for(int a = 0; a<nameStack.length; a++)
 		{
 			b = (int)(Math.random()*(51));
@@ -98,16 +144,41 @@ public class Deck
 				//shuffling names of images
 			}
 			
+			else
+				a--;
+			
 			System.out.println(nameStack[a]);
 		}
 		
+		generateImage(nameStack);
 		
 	}
 	
-	public void generateImage()
+	public void generateImage(String[] nameStack)
 	{
+		cardName = nameStack[0];
+		
+		try
+		{
+			cardImage = ImageIO.read(new File(cardName));
+		}
+		catch(IOException e)
+		{
+			System.err.println(" Error printing "+cardName);
+			e.printStackTrace();
+		}
+	}
+			
+	public void paintComponent(Graphics g)
+	{
+		super.paintComponent(g);
+		if (cardImage != null)
+		{
+			g.drawImage(cardImage, 0, 0, 200, 300, this);
+		}
 		
 	}
+	
 	public Card dealCard()
 	{
 		Card deal = cardStack[topCard];
@@ -115,5 +186,5 @@ public class Deck
 		return deal;
 	}
 	
-}
 
+}
