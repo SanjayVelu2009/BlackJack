@@ -44,17 +44,26 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.io.FileWriter;
+import java.util.Timer;
+import java.util.TimerTask;
+import javax.swing.JButton;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 
 public class TrigJack
 {
-    public TrigJack() {}
-
-    public static void main(String[] args)
+    public TrigJack() 
     {
-        TrigJack tj = new TrigJack();
-        tj.runIt();
-    }
+	}
 
+	public static void main(String[] args)
+    {
+		TrigJack tj = new TrigJack();
+		tj.runIt();
+	}
     public void runIt()
     {
         JFrame frame = new JFrame("TrigJack");
@@ -106,6 +115,8 @@ class TrigJackHolder extends JPanel
 
         card.show(this, "Start");
     }
+    
+   
 }
 
 class StartMenu extends JPanel implements ActionListener
@@ -116,6 +127,7 @@ class StartMenu extends JPanel implements ActionListener
     private JLabel titleLabel;
     private Image backgroundImage;
     private ButtonStyler styler = new ButtonStyler();
+    
 
     public StartMenu(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
@@ -126,7 +138,9 @@ class StartMenu extends JPanel implements ActionListener
 
         try
         {
-            backgroundImage = ImageIO.read(new File("background.jpeg"));
+			//for loop
+				backgroundImage = ImageIO.read(new File("background.jpeg"));
+            //array.append(backgroundImage)
         }
         catch (IOException e)
         {
@@ -336,6 +350,9 @@ class Names extends JPanel implements ActionListener
     private Image backgroundImage1;
     private JCheckBox understand;
     private JButton back;
+    private boolean insure;
+    private String playerName;
+    private PlayMenu pm = new PlayMenu(trigHolder, cards);
 
     public Names(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
@@ -371,7 +388,7 @@ class Names extends JPanel implements ActionListener
         understand.setFont(new Font("DialogInput", Font.BOLD, 12));
         add(understand);
 
-		back = new JButton("Back");
+		back = new JButton("Home");
 		back.setBounds(270, 700, 200, 60);
 		styler.styleButton(back);
 		back.addActionListener(this);
@@ -407,13 +424,17 @@ class Names extends JPanel implements ActionListener
                 cards.show(trigHolder, "Playing");
             }
         }
-        else if (evt.getActionCommand().equals("Back"))
+        else if (evt.getActionCommand().equals("Home"))
         {
 			cards.show(trigHolder, "Start");
 		}
+		
+		playerName = name.getText();
+		pm.saveName(playerName);
     }
 
-    private void saveNameToFile(String name)
+
+    public void saveNameToFile(String name)
     {
         try (FileWriter writer = new FileWriter("players.txt", true))
         {
@@ -423,6 +444,9 @@ class Names extends JPanel implements ActionListener
         {
             System.err.println("Error saving name: " + e.getMessage());
         }
+        
+        
+       
     }
 
     public void paintComponent(Graphics g)
@@ -446,12 +470,44 @@ class PlayMenu extends JPanel
 	private JButton allIn;
 	private JButton hit;
 	private JButton stand;
+	
     private TrigJackHolder trigHolder;
     private CardLayout cards;
+    
     private ButtonStyler styler = new ButtonStyler();
+    private Image backgroundImage2;
+    private JLabel moneyTrack;
+    
+    private Game game = new Game();
+    private String name = "";
+    private Player player;
+    private int moneyAmt;
+    private int totalAmt;
+    private boolean gameState;
+    private Deck deck = new Deck();
+    private Dealer dealer = new Dealer();
+    
+    private String[] playerCards = new String[3];
+    private String[] dealerCards = new String[3];
+    
 
     public PlayMenu(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
+		trigHolder = trigHolderIn;
+		cards = cardsIn;
+		try
+        {
+            backgroundImage2 = ImageIO.read(new File("playMenu.jpeg"));
+        }
+        catch (IOException e)
+        {
+            System.err.println("Background image not found: " + e.getMessage());
+            setBackground(new Color(53, 101, 77));
+        }
+           
+        
+        moneyTrack = new JLabel("Amount Bet $0");
+		moneyTrack.setForeground(Color.WHITE);
            
         setLayout(new BorderLayout());
         setBackground(new Color(53, 101, 77));
@@ -460,6 +516,8 @@ class PlayMenu extends JPanel
 		northPanel.setLayout(new BorderLayout());
 		add(northPanel, BorderLayout.NORTH);
 		
+		
+		
 		JPanel westPanel = new JPanel();
 		westPanel.setLayout(new BorderLayout());
 		add(westPanel, BorderLayout.WEST);
@@ -467,18 +525,47 @@ class PlayMenu extends JPanel
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridLayout(2,1));
 		add(buttonPanel, BorderLayout.WEST);
-	
+		
         betting = new JSlider(0,2000,0);
         betting.setMajorTickSpacing(200);
 	    betting.setPaintLabels(true);
 	    betting.setFont(new Font("Serif", Font.PLAIN,15));
+	    betting.setForeground(new Color(255, 215, 0));
 	    betting.setOrientation(JSlider.HORIZONTAL);
-		
+	    
+	    class SliderControl implements ChangeListener
+	    {
+			public void stateChanged(ChangeEvent evt)
+			{
+				moneyAmt = betting.getValue();
+				
+				if (moneyAmt > 0)
+				{
+					moneyTrack.setText(" Amount Bet $" + moneyAmt);
+					repaint();
+				}
+				else if (moneyAmt == 0)
+				{
+					moneyTrack.setText("Amount Bet $0");
+					repaint();
+				}
+			}
+		}
+	    
+	    betting.addChangeListener(new SliderControl());
+	    
+	    JPanel labelPanel = new JPanel();
+		labelPanel.setLayout(null);
+		add(labelPanel, BorderLayout.EAST);
+		labelPanel.add(moneyTrack);
+		moneyTrack.setBounds(700,500,100,50);		
+	   
 		JMenuItem insure = new JMenuItem("insurance");
 		JMenuItem doubleDown = new JMenuItem("double down");
 		JMenuItem split = new JMenuItem("split");
 		
 		menuOpt = new JMenu("Options");
+		menuOpt.setForeground(new Color(255, 215, 0));
 		
 		menuOpt.add(insure);
 		menuOpt.add(doubleDown);
@@ -493,13 +580,120 @@ class PlayMenu extends JPanel
 		stand = new JButton("STAND");
 		styler.styleButton(stand);
 		
+        
+        //int currentMoney = game.totalMoney() - betting.getValue();
+        
+        //tArea.setText(" Current Balance " + (currentMoney) +"\n"
+        
+        gameState = false;
+		
 		buttonPanel.add(hit);
 		buttonPanel.add(stand);
 		
 		add(betting,BorderLayout.SOUTH);
 		add(menuBar,BorderLayout.NORTH);
 		
+		saveName(name);
+		//create a really small JTextArea to show amount bet and total amount of money 
+		//betMoney method does that
+		//initAndShuffleDeck
+		//initHands
+		//insuranceOption
+		//playerTurn
+		//dealerTurn
+		//determine who won
+		//settleAmount
+		//problem if needed
+		//solution if needed
+		//playAgain
+		//when implementing double down don't forget to double the bet amount
+		
     }
+    
+    public void saveName(String naming)
+    {
+		name = naming;
+		player = new Player(name);
+		System.out.println(name);
+	}
+    
+    public void betMoney()
+    {
+		
+		totalAmt = player.getCurrentBalance(moneyAmt, gameState);
+		
+		
+		//pass this into a method and if they won add amtBet to current balance, update, and do vice versa
+	}
+	
+	public void initAndShuffleDeck()
+	{
+		deck.initDeck();
+		game.initHands();
+		for(int i = 0; i<4; i++)
+		{
+			playerCards[i] = player.showHand(i);
+			dealerCards[i] = dealer.showHand(i);
+		}
+		
+		
+		
+		//insure = false;		//insure is used to check if the user clicked on the insurance button under the correct circumstances
+		//insure = game.initDeck();	//initializes, shuffles deck, insureCheck(), and initializes Hands
+		
+		//add a changeListener or something for the insurance button within the game menu
+		
+			
+		//need a method to display 
+		
+		
+	}
+	
+
+	public void playerTurn()
+	{
+		
+	}
+	
+	public void dealerTurn()
+	{
+	
+	}
+	
+	public void determineWhoWon()
+	{
+		
+	}
+	
+	public void settleAmount()
+	{
+	
+	}
+	
+	public void problemIfNeeded()
+	{
+	
+	}
+	
+	public void solutionIfNeeded()
+	{
+	
+	}
+	
+	public void playAgain()
+	{
+	
+	}
+    
+	public void paintComponent(Graphics g)
+	{
+		super.paintComponent(g);
+		if (backgroundImage2 != null)
+		{
+			g.drawImage(backgroundImage2, 0, 0, getWidth(), getHeight(), this);
+		}
+	}
+    
 }
 
 class Problem extends JPanel
