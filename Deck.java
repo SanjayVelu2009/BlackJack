@@ -61,20 +61,14 @@ class DeckPanel extends JPanel
 	public DeckPanel()
 	{
 		topCard = 0;
-		
+		initializeDeck();
 	}
 	
 	public static void main(String[] args)
 	{
 		DeckPanel testDeck = new DeckPanel();
-		testDeck.runIt();
 	}
 		
-	public void runIt()
-	{
-		initializeDeck();		
-	}
-	
 	public void initializeDeck()
 	{
 		int cardIndex = 0;
