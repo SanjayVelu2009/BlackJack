@@ -23,8 +23,9 @@ public class Card
 		return type;
 	}
 	
-	public void show()
+	public String show()
 	{
+		String card = "";
 		String suite = "";
 		
 		if(type == 'S')		//if it is Spade
@@ -49,16 +50,29 @@ public class Card
 		
 		//Defining Face Cards
 		if (value < 11)
-			System.out.println(value+" "+suite);
+		{	
+			card = value+" "+suite;
+			return card;
+		}
 		
 		else if (value == 11)
-			System.out.println("Jack "+suite);
+		{
+			card = "Jack "+suite;
+			return card;
+		}
 		
 		else if (value == 12)
-			System.out.println("Queen "+suite);
-		
+		{
+			card = "Queen "+suite;
+			return card;
+		}
 		else if (value == 13)
-			System.out.println("King "+suite);
+		{
+			card = "King " + suite;
+			return card;
+		}
+		
+		return card;
 	}
 	
 }
