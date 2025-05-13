@@ -35,23 +35,13 @@ public class Dealer
 		return totalValue;
 	}
 	
-	public void stand()
-	{
-		System.out.println("The dealer's turn is over!");
-	}
 	
-	public void showHand(boolean showing)
+	
+	public String showHand(int i)
 	{
-		if(showing == true)
-		{
-			dealHand[0].show();
-			dealHand[1].show();
-		}
+		String card = dealHand[i].show();
 		
-		else
-		{
-			dealHand[0].show();
-		}
+		return card;
 	}
 	
 	public boolean checkDealerBlackJack()
