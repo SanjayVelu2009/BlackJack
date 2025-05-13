@@ -13,7 +13,7 @@ public class Player
 	public Player(String inName)
 	{
 		drawnCards = new Card[10];
-		currentBalance = 1000;
+		currentBalance = 10000;
 		amountBet = -1;
 		numCards = 0;
 		name = inName;
@@ -30,12 +30,11 @@ public class Player
 		numCards++;
 	}
 	
-	public void showHand()
+	public String showHand(int i)
 	{
-		for(int i = 0; i<numCards; i++)
-		{
-			drawnCards[i].show();
-		}
+		String card = "";
+		card = drawnCards[i].show();
+		return card;
 	}
 	public void hit(Card c)
 	{
@@ -45,7 +44,7 @@ public class Player
 	
 	public void stand()
 	{
-		
+		System.out.println("\nYour turn is over!\n");
 	}
 	
 	public void split()
@@ -61,18 +60,26 @@ public class Player
 		
 	}
 	
-	public boolean placeBet(int amt)
+	public int placeBet(int amt, boolean game)
 	{
-		boolean betSuccess = false;
+		
 		
 		if (currentBalance >= amt)
 		{
-			amountBet += amt;
+			amountBet = amt;
+			/*amountBet += amt;
 			currentBalance -= amountBet;	
-			betSuccess = true;
+			betSuccess = true;*/
 		}
 		
-		return betSuccess;
+		if(game == true)
+		{
+			currentBalance+=amt;
+		}
+
+			
+		return amountBet;
+		
 	}
 	
 	public boolean checkBlackJack()
