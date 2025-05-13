@@ -124,9 +124,9 @@ public class Deck
 		
 	}
 	
-	public void generateImage(int i)
+	public void generateImage(String name)
 	{
-		cardName = nameStack[i];
+		cardName = name;
 		
 		try
 		{
