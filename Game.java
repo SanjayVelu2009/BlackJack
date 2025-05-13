@@ -24,59 +24,41 @@ public class Game
 	}
 	
 	public static void main(String[] args)
-	{
-		Game g = new Game();
-		
-		
-		
-		g.getInfo();
-		
-		g.determine();
-	
-		
+	{	
 	}
 	
-	public void getInfo()
-	{
-		Scanner keyboard = new Scanner(System.in);
-		
-		System.out.println("Hello Player! Welcome to Blackjack, please enter your name!");
-		playerName = keyboard.nextLine();
-		
-		
-		p = new Player(playerName);
-		
-		betMoney();
-		
-		
-	}
 	
-	public void dealCards()
-	{
-		
-		
-		initHands();
-		showCards();
-		
-		
-	}
 	
-	public void initHands()
+	public boolean insureCheck()
 	{
+		boolean insureChecker = false;
 		Card playerCard1 = d.dealCard();
 		Card dealerCard1 = d.dealCard();
+		if(dealerCard1.show().contains("1"))
+		{
+			insureChecker = true;
+			
+		}
+		//~ else
+			//~ return insureChecker;
+	
+		initHands(playerCard1, dealerCard1);
+		return insureChecker;
+	}
+	public void initHands(Card playerCard1, Card dealerCard1)
+	{
+		
 		Card playerCard2 = d.dealCard();
 		Card dealerCard2 = d.dealCard();
-		
 		p.initPlayerHand(playerCard1,playerCard2);
-		
 		de.initDealerCards(dealerCard1,dealerCard2);
 		
-		
-		
+		//after this method was called in the PlayMenu show the image using image(animation & timer)
 	}
 	
-	public void showCards()
+	
+		
+	/*public void showCards()
 	{
 		System.out.println("Player Cards");
 		p.showHand();
@@ -85,140 +67,101 @@ public class Game
 		System.out.println("Dealer Cards");
 		de.showHand(false);
 		System.out.println();
-		
-		
-	}
+	}*/
 	
-	
-	public void betMoney()
+	public void playerTurn(boolean decision)
 	{
-		Scanner keyboard = new Scanner(System.in);
-		
-		System.out.println("Please enter how much you would like to bet for this round!");
-		
-		amtBet = keyboard.nextInt();
-		
-		//Player p = new Player();
-		
-		boolean checker = p.placeBet(amtBet);
-		
-		if(checker == true)	//checking if amount bet is valid
-		{
-			dealCards();
-			playerTurn();
-			dealerTurn();
-		}
-		else
-			System.out.println("Please enter a valid betting amount");
-		
-		
-	}
-	
-	
-	public void playerTurn()
-	{
-		String decision = "";
-		Scanner keyboard = new Scanner(System.in);
-		System.out.println("Would you like to hit or stand?");
-		decision = keyboard.nextLine();
-		
-		if(decision.equalsIgnoreCase("hit"))
+		//The current options are to hit and stand
+		if(decision == true)
 		{
 			Card hitting = d.dealCard();
-			hitting.show();
 			p.hit(hitting);
-			
-		}
-		else if(decision.equalsIgnoreCase("stand"))
-		{
-			p.stand();
 		}
 		else
-			System.out.println("Please enter a valid statement!");
+			p.stand();
 		
-		dealerReveal();
+		//after this method was called in the PlayMenu show the image using image(animation & timer)	 
 	}
 	
-	public void dealerReveal()
+	public boolean playerSplit(Card playerC1, Card playerC2)
+	{
+		if(playerC1.show().equals(playerC2.show()))
+		{
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	public void playerDoubleDown()
+	{
+		Card doubler = d.dealCard();
+		p.hit(doubler);
+		//make sure to double the bet amount in the TrigJack class
+	}
+	
+	public boolean dealerReveal()
 	{	
 		if(p.checkBlackJack() == true)
 		{
-			System.out.println("Let's see the dealer's cards!");
-			de.showHand(true);
+			//de.showHand(true);
 			dealerTurn();
+			return true;
 		}
 		else
 		{
-			System.out.println("You lost this round!");
-			gameState = false;
+			return false;
 		}
 		
-			
+		//if it returns true send this message ("Let's see the dealer's cards!") or if it is fale return ("You lost this round!")		
 	}
 	
-	public void dealerTurn()
+	public boolean dealerTurn()
 	{
-		boolean checker = determine();
-		/*if(checker == true) //when the dealer is greater than the player
+		if(de.checkHitOrStand() == true)
 		{
-			gameState = false;
-			System.out.println("Game Ended");
-		}
-			*/
-		
-		if(de.checkHitOrStand() == true) //gameState == true)
-		{
-			System.out.println("The dealer decided to hit!");
+			//print message the dealer decided to hit!
 			Card dealHit = d.dealCard();
-			dealHit.show();
 			totalDealerValue = de.hit(dealHit);
+			return true;
 		}
-		else if(de.checkHitOrStand() == false)//gameState == true)
+		
+		else 
 		{
-			System.out.println("The dealer decided to stand!");
-			de.stand();
+			//print message The dealer decided to stand!
+			return false;
 		}
 		
 	}
 	
-	public boolean determine()
+	public String determine()
 	{
-		boolean greater = false;	//for the dealer
+		String greater = "false";	//for the dealer
 		totalPlayerValue = p.getPlayerAmount();
 		
 		if(totalDealerValue <= 21 && totalPlayerValue <=21)
 		{
 			if(totalDealerValue > totalPlayerValue)
 			{
-				System.out.println("You Lost!");
-				greater = true;
+				//print message the player lost and that he will be directed to the problem page
+				greater = "true";
 			
 			}
-			
 			else if(totalDealerValue < totalPlayerValue)
 			{
-				System.out.println("You won!");
-				greater = false;
-				
+				//print message the player won and how much money he won
+				greater = "false";	
 			}
-			
-			else if(totalDealerValue == totalPlayerValue)
-				System.out.println("Its a push!!!");
+			else
+			{
+				greater = "push";
+			}
 		}
-		
-		gameState = false;
-		
 		return greater;
 		
 	}
 	
 }
-
-
-
-
-
-
 
 
 
