@@ -51,6 +51,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
+
 
 
 public class TrigJack
@@ -477,6 +479,7 @@ class PlayMenu extends JPanel
     private ButtonStyler styler = new ButtonStyler();
     private Image backgroundImage2;
     private JLabel moneyTrack;
+    private boolean insureCheck;
     
     private Game game = new Game();
     private String name = "";
@@ -489,7 +492,7 @@ class PlayMenu extends JPanel
     
     private String[] playerCards = new String[3];
     private String[] dealerCards = new String[3];
-    
+    private int insureAmount = 0;
 
     public PlayMenu(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
@@ -562,14 +565,14 @@ class PlayMenu extends JPanel
 	   
 		JMenuItem insure = new JMenuItem("insurance");
 		JMenuItem doubleDown = new JMenuItem("double down");
-		JMenuItem split = new JMenuItem("split");
+		//JMenuItem split = new JMenuItem("split");
 		
 		menuOpt = new JMenu("Options");
 		menuOpt.setForeground(new Color(255, 215, 0));
 		
 		menuOpt.add(insure);
 		menuOpt.add(doubleDown);
-		menuOpt.add(split);
+		//menuOpt.add(split);
 		
 		menuBar = new JMenuBar();
 		menuBar.add(menuOpt);
@@ -620,7 +623,7 @@ class PlayMenu extends JPanel
     public void betMoney()
     {
 		
-		totalAmt = player.getCurrentBalance(moneyAmt, gameState);
+		totalAmt = player.placeBet(moneyAmt, gameState);
 		
 		
 		//pass this into a method and if they won add amtBet to current balance, update, and do vice versa
@@ -628,23 +631,28 @@ class PlayMenu extends JPanel
 	
 	public void initAndShuffleDeck()
 	{
-		deck.initDeck();
-		game.initHands();
+		deck.initializeDeck();	//initializes decks
+		deck.shuffleDeckAndImage(); //shuffles deck array and image array
+		insureCheck = game.insureCheck();	//initializes hands
+		
+		if(insureCheck = true)
+		{
+			JOptionPane.showMessageDialog(PlayMenu.this, "The dealer has an Ace, would you like to pay insureance? If yes go to the menu and click on the insureance button.");
+		}
+		
+		//do the message stuff using the JDropDownMenu and get input using JOPtionPane again
+		
+		
 		for(int i = 0; i<4; i++)
 		{
-			playerCards[i] = player.showHand(i);
+			playerCards[i] = player.showHand(i);	//saves the names (file names) of the cards to the string arrays
 			dealerCards[i] = dealer.showHand(i);
 		}
 		
+		deck.generateImage(playerCards[0]);
+		deck.generateImage(playerCards[1]);
+		deck.generateImage(dealerCards[1]);
 		
-		
-		//insure = false;		//insure is used to check if the user clicked on the insurance button under the correct circumstances
-		//insure = game.initDeck();	//initializes, shuffles deck, insureCheck(), and initializes Hands
-		
-		//add a changeListener or something for the insurance button within the game menu
-		
-			
-		//need a method to display 
 		
 		
 	}
