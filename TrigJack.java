@@ -601,7 +601,8 @@ class PlayMenu extends JPanel
 		saveName(name);
 		//create a really small JTextArea to show amount bet and total amount of money 
 		//betMoney method does that
-		//initAndShuffleDeck
+		betMoney();
+		initAndShuffleDeck();
 		//initHands
 		//insuranceOption
 		//playerTurn
