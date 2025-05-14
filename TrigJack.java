@@ -667,8 +667,10 @@ class PlayMenu extends JPanel
 		
 		for(int i = 0; i<4; i++)
 		{
-			playerCards[i] = player.showHand(i);	//saves the names (file names) of the cards to the string arrays
-			dealerCards[i] = dealer.showHand(i);
+			playerCards[i] = player.showHand(i);	//saving image strings
+			
+			dealerCards[i+1] = dealer.showHand(i+1);
+			i++
 		}
 		
 		imageChecker = true;
