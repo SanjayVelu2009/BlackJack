@@ -109,4 +109,3 @@ public class Player
 		return jackChecker;
 	}
 }
-
