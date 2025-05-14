@@ -481,14 +481,15 @@ class PlayMenu extends JPanel
     private JLabel moneyTrack;
     private boolean insureCheck;
     
-    private Game game = new Game();
+    private Game game;
+    
     private String name = "";
     private Player player;
     private int moneyAmt;
     private int totalAmt;
     private boolean gameState;
-    private Deck deck = new Deck();
-    private Dealer dealer = new Dealer();
+   // private Deck deck = new Deck();
+    //private Dealer dealer = new Dealer();
     
     private String[] playerCards = new String[3];
     private String[] dealerCards = new String[3];
@@ -599,10 +600,12 @@ class PlayMenu extends JPanel
 		add(menuBar,BorderLayout.NORTH);
 		
 		saveName(name);
+		game = new Game(name);
+		//saveName(name);
 		//create a really small JTextArea to show amount bet and total amount of money 
 		//betMoney method does that
-		betMoney();
-		initAndShuffleDeck();
+		//betMoney();
+		//initAndShuffleDeck();
 		//initHands
 		//insuranceOption
 		//playerTurn
@@ -619,42 +622,26 @@ class PlayMenu extends JPanel
     public void saveName(String naming)
     {
 		name = naming;
-		player = new Player(name);
+		//player = new Player(name);
 		System.out.println(name);
 	}
     
     public void betMoney()
     {
 		
-		totalAmt = player.placeBet(moneyAmt, gameState);
+		totalAmt = game.placeBet();
 		
 		
 		//pass this into a method and if they won add amtBet to current balance, update, and do vice versa
 	}
 	
-	public Image generateImage(String name)
-	{
-		String cardName = name;
-		
-		try
-		{
-			cardImage = ImageIO.read(new File(cardName));
-		}
-		catch(IOException e)
-		{
-			System.err.println(" Error printing "+cardName);
-			e.printStackTrace();
-		}
-		
-		return cardImage;
-		
-		
-	}
 	
 	public void initAndShuffleDeck()
 	{
-		deck.initializeDeck();	//initializes decks
-		deck.shuffleDeckAndImage(); //shuffles deck array and image array
+		//deck.initializeDeck();	//initializes decks
+		//deck.shuffleDeckAndImage(); //shuffles deck array and image array
+		
+		game.initializeAndShuffleDeck();
 		insureCheck = game.insureCheck();	//initializes hands
 		
 		if(insureCheck = true)
@@ -665,21 +652,17 @@ class PlayMenu extends JPanel
 		//do the message stuff using the JDropDownMenu and get input using JOPtionPane again
 		
 		
-		for(int i = 0; i<4; i++)
+		/* for(int i = 0; i<2; i++)
 		{
-			playerCards[i] = player.showHand(i);	//saving image strings
+			playerCards[i] = game.(i);	//saving image strings
 			
-			dealerCards[i+1] = dealer.showHand(i+1);
-			i++
+			dealerCards[i] = game.getDealerCardName(i);
+			
 		}
 		
-		imageChecker = true;
-		cardImage = generateImage(playerCards[0]);
+		imageChecker = true; */
+		
 		repaint();
-		//cardImage = deck.generateImage(playerCards[1]);
-		//repaint();
-		//cardImage = deck.generateImage(dealerCards[1]);
-		//repaint();
 	}
 	
 
