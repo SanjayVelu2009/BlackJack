@@ -1,8 +1,8 @@
-import java.util.Scanner;
+
 public class Game
 {
 	private int roundNum;
-	private String playerName;
+	//private String playerName;
 	private int amtBet;
 	private Player p;
 	private Deck d;
@@ -11,24 +11,29 @@ public class Game
 	private int totalPlayerValue;
 	private boolean gameState;
 	
-	public Game()
+	public Game(String name)
 	{
+		//create deck and shuffle
 		d = new Deck();
+		d.shuffleDeck();
+		
+		// create dealer and player
 		de = new Dealer();
+		p = new Player(name);
+		
 		roundNum = 0;
 		amtBet = 0;
-		playerName = " ";
 		totalDealerValue = 0;
 		totalPlayerValue = 0;
 		gameState = true;
 	}
 	
-	public static void main(String[] args)
-	{	
+
+	public int placeBet()
+	{
+		return 0;
 	}
-	
-	
-	
+
 	public boolean insureCheck()
 	{
 		boolean insureChecker = false;
@@ -45,6 +50,7 @@ public class Game
 		initHands(playerCard1, dealerCard1);
 		return insureChecker;
 	}
+	
 	public void initHands(Card playerCard1, Card dealerCard1)
 	{
 		
@@ -81,16 +87,6 @@ public class Game
 			p.stand();
 		
 		//after this method was called in the PlayMenu show the image using image(animation & timer)	 
-	}
-	
-	public boolean playerSplit(Card playerC1, Card playerC2)
-	{
-		if(playerC1.show().equals(playerC2.show()))
-		{
-			return true;
-		}
-		else
-			return false;
 	}
 	
 	public void playerDoubleDown()
@@ -162,7 +158,6 @@ public class Game
 	}
 	
 }
-
 
 
 
