@@ -78,8 +78,6 @@ public class Deck
 			cardStack[cardIndex++] = spadeCard;
 		}
 		
-		
-		shuffleDeckAndImage();
 	}
 	
 	public  void showDeck()
@@ -117,14 +115,14 @@ public class Deck
 			else
 				a--;
 			
-			System.out.println(nameStack[a]);
+			//System.out.println(nameStack[a]);
 		}
 		
 		//generateImage();
 		
 	}
 	
-	public void generateImage(String name)
+	/*public void generateImage(String name)
 	{
 		cardName = name;
 		
@@ -137,7 +135,7 @@ public class Deck
 			System.err.println(" Error printing "+cardName);
 			e.printStackTrace();
 		}
-	}
+	}*/
 			
 
 	public Card dealCard()
