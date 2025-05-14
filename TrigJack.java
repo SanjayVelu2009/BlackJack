@@ -493,7 +493,9 @@ class PlayMenu extends JPanel
     private String[] playerCards = new String[3];
     private String[] dealerCards = new String[3];
     private int insureAmount = 0;
-
+	private Image cardImage;
+	private boolean imageChecker = false;
+	
     public PlayMenu(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
 		trigHolder = trigHolderIn;
@@ -629,6 +631,25 @@ class PlayMenu extends JPanel
 		//pass this into a method and if they won add amtBet to current balance, update, and do vice versa
 	}
 	
+	public Image generateImage(String name)
+	{
+		String cardName = name;
+		
+		try
+		{
+			cardImage = ImageIO.read(new File(cardName));
+		}
+		catch(IOException e)
+		{
+			System.err.println(" Error printing "+cardName);
+			e.printStackTrace();
+		}
+		
+		return cardImage;
+		
+		
+	}
+	
 	public void initAndShuffleDeck()
 	{
 		deck.initializeDeck();	//initializes decks
@@ -649,16 +670,19 @@ class PlayMenu extends JPanel
 			dealerCards[i] = dealer.showHand(i);
 		}
 		
-		deck.generateImage(playerCards[0]);
-		deck.generateImage(playerCards[1]);
-		deck.generateImage(dealerCards[1]);
-		
-		
-		
+		imageChecker = true;
+		cardImage = generateImage(playerCards[0]);
+		repaint();
+		//cardImage = deck.generateImage(playerCards[1]);
+		//repaint();
+		//cardImage = deck.generateImage(dealerCards[1]);
+		//repaint();
 	}
 	
 
-	public void playerTurn()
+	
+
+	/*public void playerTurn()
 	{
 		
 	}
@@ -691,15 +715,21 @@ class PlayMenu extends JPanel
 	public void playAgain()
 	{
 	
-	}
+	}*/
     
 	public void paintComponent(Graphics g)
 	{
 		super.paintComponent(g);
-		if (backgroundImage2 != null)
+		
+		if (backgroundImage2 != null && imageChecker == false)
 		{
-			g.drawImage(backgroundImage2, 0, 0, getWidth(), getHeight(), this);
+			//g.drawImage(backgroundImage2, 0, 0, getWidth(), getHeight(), this);
 		}
+		g.drawRect(100, 100, 200, 20);
+		//if (cardImage != null)
+		//{
+			g.drawImage(cardImage, 500, 300, 200, 300, this);
+		//}
 	}
     
 }
