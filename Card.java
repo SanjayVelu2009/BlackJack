@@ -1,26 +1,64 @@
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import java.io.FileWriter;
 public class Card
 {
 	private int value;
 	private char type;
+	private Image cardImage;
+ 
 	
 	public Card (int inVal, char inType)
 	{
 		value = inVal;
 		type = inType;
+		cardImage = readImg(getCardImgFileName());
+		
+	}
+	
+	private String getCardImgFileName()
+	{
+		String imgFileName = value+""+type+".jpg";
+		return imgFileName;
+	}
+	
+	private Image readImg(String cardName)
+	{
+		try
+		{
+			cardImage = ImageIO.read(new File(cardName));
+		}
+		catch(IOException e)
+		{
+			System.err.println("Error printing "+cardName);
+			e.printStackTrace();
+		}
+		
+		return cardImage;
 	}
 	
 	public int getValue()
 	{
+		int retVal = value;
+		
 		if(value == 11 || value == 12 || value == 13)
 		{
-			value = 10;
+			retVal = 10;
 		}
-		return value;
+		
+		return retVal;
 	}
 	
 	public char getType()
 	{
 		return type;
+	}
+	
+	public Image getImage()
+	{
+		return cardImage;
 	}
 	
 	public String show()
