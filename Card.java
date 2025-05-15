@@ -1,8 +1,11 @@
+
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.io.FileWriter;
+import javax.swing.JPanel;
+import java.awt.Graphics;
 
 public class Card
 {
@@ -65,7 +68,7 @@ public class Card
 	/* @TODO Render card image */
 	public void render(Graphics g, JPanel panel)
 	{
-		
+		g.drawImage(getImage(),150,150,100,100,panel);
 	}
 	
 	public String show()
