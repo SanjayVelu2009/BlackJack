@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.io.FileWriter;
+
 public class Card
 {
 	private int value;
@@ -59,6 +60,12 @@ public class Card
 	public Image getImage()
 	{
 		return cardImage;
+	}
+	
+	/* @TODO Render card image */
+	public void render(Graphics g, JPanel panel)
+	{
+		
 	}
 	
 	public String show()
