@@ -62,7 +62,7 @@ public class Player
 	{
 		int amountBet = 0;
 		
-		if (currentBalance >= amt)
+		if (currentBalance >= amt && amt>= 5000)
 		{
 			amountBet = amt;
 			currentBalance -= amountBet;	
@@ -88,7 +88,12 @@ public class Player
 	/* @TODO Render Player Hand image */
 	public void renderHand(Graphics g, JPanel panel)
 	{
-		
+		Card playerCard;
+		for(int i = 0; i<playerHand.length; i++)
+		{
+			playerCard = playerHand[i];
+			playerCard.render(g, panel);
+		}
 	}
 	
 	public int getPlayerHandValue()
