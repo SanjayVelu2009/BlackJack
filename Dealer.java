@@ -1,52 +1,38 @@
 public class Dealer
 {
-	Card[] dealHand;
+	Card[] dealerHand;
 	int numCards;
+	
 	//dealer must hit if both cards revealed are 16 or less and must stand if the total is 17 or more
 	public Dealer()
 	{
-		dealHand = new Card[10];
+		dealerHand = new Card[10];
 		numCards = 0;
-		
-		
 	}
 	
-	public void initDealerCards(Card card1, Card card2)
+	public void dealCard(Card c)
 	{
-		dealHand[0] = card1;
-		numCards++;
-		
-		dealHand[1] = card2; //needs to be face down will be done in the game class
+		dealerHand[numCards] = c;
 		numCards++;
 	}
 	
-	public int hit(Card dealerHit)
+	public void hit(Card dealerHit)
 	{
-		dealHand[numCards-1] = dealerHit;
-		numCards++;
-		
-		int totalValue = 0;
-		
-		for(int i = 0; i<numCards-1; i++)
-		{
-			totalValue += dealHand[i].getValue();
-		}
-		
-		return totalValue;
+		dealerHand[numCards-1] = dealerHit;
+		numCards++;	
 	}
-	
-	
 	
 	public String showHand(int i)
 	{
-		String card = dealHand[i].show();
+		String card = dealerHand[i].show();
 		
 		return card;
 	}
 	
+	/* @TODO need to understand how checkDealerBlackJack is used */
 	public boolean checkDealerBlackJack()
 	{
-		if((dealHand[0].getValue() + dealHand[1].getValue()) <= 21)
+		if((getHandValue()) <= 21)
 		{
 			return true;
 		}
@@ -57,9 +43,16 @@ public class Dealer
 		}
 	}
 	
-	public boolean checkHitOrStand()
+	/* Returns True if the Hand is empty and false otherwise */
+	public boolean isHandEmpty()
 	{
-		if((dealHand[0].getValue() + dealHand[1].getValue()) <= 16)
+		return (numCards == 0);
+	}
+	
+	/* Check if the dealer must hit */
+	public boolean mustHit()
+	{
+		if((getHandValue()) <= 16)
 		{
 			return true;
 		}
@@ -67,5 +60,25 @@ public class Dealer
 		{
 			return false;
 		}
+	}
+	
+	/* Return total value of the hand */
+	public int getHandValue()
+	{
+		int totalValue = 0;
+		
+		for(int i = 0; i<numCards-1; i++)
+		{
+			totalValue += dealerHand[i].getValue();
+		}
+		
+		return totalValue;
+	}
+		
+		
+	/* @TODO Render Dealer Hand image */
+	public void renderHand(Graphics g, JPanel panel)
+	{
+		
 	}
 }
