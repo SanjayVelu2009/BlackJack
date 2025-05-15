@@ -253,8 +253,8 @@ class Instructions extends JPanel implements ActionListener
             "- J, Q, K: Worth 10.\n" +
             "- A: Worth 1 or 11.\n\n" +
             "Gameplay:\n" +
-            "- Minimum bet: $10.\n" +
-            "- Start with $1000. \n" +
+            "- Minimum bet: $5000.\n" +
+            "- Start with $10000. \n" +
             "- Players and dealer are each dealt two cards (one of dealer’s face-down).\n\n" +
             "Blackjack:\n" +
             "- If player gets 21 and dealer doesn't, player wins 1.5x their bet.\n\n" +
@@ -496,6 +496,7 @@ class PlayMenu extends JPanel
     private int insureAmount = 0;
 	private Image cardImage;
 	private boolean imageChecker = false;
+	private JPanel centerPanel;
 	
     public PlayMenu(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
@@ -514,7 +515,8 @@ class PlayMenu extends JPanel
         
         moneyTrack = new JLabel("Amount Bet $0");
 		moneyTrack.setForeground(Color.WHITE);
-           
+        
+        /*Main Panels*/   
         setLayout(new BorderLayout());
         setBackground(new Color(53, 101, 77));
 		
@@ -522,15 +524,20 @@ class PlayMenu extends JPanel
 		northPanel.setLayout(new BorderLayout());
 		add(northPanel, BorderLayout.NORTH);
 		
-		
-		
 		JPanel westPanel = new JPanel();
 		westPanel.setLayout(new BorderLayout());
 		add(westPanel, BorderLayout.WEST);
 		
+		centerPanel = new JPanel();
+		centerPanel.setLayout(new GridLayout(2,3));
+		add(centerPanel, BorderLayout.CENTER);
+		
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridLayout(2,1));
 		add(buttonPanel, BorderLayout.WEST);
+		
+		////////////////////////////////////////////////////////////////
+		
 		
         betting = new JSlider(0,2000,0);
         betting.setMajorTickSpacing(200);
@@ -539,6 +546,10 @@ class PlayMenu extends JPanel
 	    betting.setForeground(new Color(255, 215, 0));
 	    betting.setOrientation(JSlider.HORIZONTAL);
 	    
+	    /* @TODO create Home Button and add to JMenu(cardLayout)
+	     * @DONE create Center Panel with Grid Layout */
+	    
+	    /* @TODO adjust slider for the minimum to be 5000*/
 	    class SliderControl implements ChangeListener
 	    {
 			public void stateChanged(ChangeEvent evt)
@@ -601,6 +612,20 @@ class PlayMenu extends JPanel
 		
 		saveName(name);
 		game = new Game(name);
+		
+		
+		/* @TODO Game Logic
+		/* Player is created, Name is saved, Dealer is created, Deck is created and shuffled.
+		 * initializeGame
+		 * Display cards 
+		 * Take action on Insurance 
+		 * Deal second card
+		 * */
+		
+		
+		
+		
+		
 		//saveName(name);
 		//create a really small JTextArea to show amount bet and total amount of money 
 		//betMoney method does that
@@ -631,7 +656,6 @@ class PlayMenu extends JPanel
 		
 		totalAmt = game.placeBet();
 		
-		
 		//pass this into a method and if they won add amtBet to current balance, update, and do vice versa
 	}
 	
@@ -641,13 +665,8 @@ class PlayMenu extends JPanel
 		//deck.initializeDeck();	//initializes decks
 		//deck.shuffleDeckAndImage(); //shuffles deck array and image array
 		
-		game.initializeAndShuffleDeck();
-		insureCheck = game.insureCheck();	//initializes hands
 		
-		if(insureCheck = true)
-		{
-			JOptionPane.showMessageDialog(PlayMenu.this, "The dealer has an Ace, would you like to pay insureance? If yes go to the menu and click on the insureance button.");
-		}
+		JOptionPane.showMessageDialog(PlayMenu.this, "The dealer has an Ace, would you like to pay insureance? If yes go to the menu and click on the insureance button.");
 		
 		//do the message stuff using the JDropDownMenu and get input using JOPtionPane again
 		
@@ -707,6 +726,8 @@ class PlayMenu extends JPanel
 	{
 		super.paintComponent(g);
 		
+		game.render(g,centerPanel); 
+		
 		if (backgroundImage2 != null && imageChecker == false)
 		{
 			//g.drawImage(backgroundImage2, 0, 0, getWidth(), getHeight(), this);
@@ -714,7 +735,8 @@ class PlayMenu extends JPanel
 		g.drawRect(100, 100, 200, 20);
 		//if (cardImage != null)
 		//{
-			g.drawImage(cardImage, 500, 300, 200, 300, this);
+			/*@TODO instead of this pass in center panel when calling render so, in drawImage for card we can pass in the center panel object instead of this*/
+			//g.drawImage(cardImage, 500, 300, 200, 300, this);
 		//}
 	}
     
