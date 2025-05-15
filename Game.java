@@ -1,15 +1,15 @@
 
 public class Game
 {
-	private int roundNum;
-	//private String playerName;
-	private int amtBet;
+
 	private Player p;
-	private Deck d;
 	private Dealer de;
-	private int totalDealerValue;
-	private int totalPlayerValue;
+	private Deck d;	
+	
 	private boolean gameState;
+	private int roundNum;
+	private int potValue;
+	
 	
 	public Game(String name)
 	{
@@ -22,78 +22,54 @@ public class Game
 		p = new Player(name);
 		
 		roundNum = 0;
-		amtBet = 0;
-		totalDealerValue = 0;
-		totalPlayerValue = 0;
+		potValue = 0;
 		gameState = true;
 	}
 	
 
+	/* @TODO Add logic for player to place bet? Should there be a minimum bet enforcement? */
 	public int placeBet()
 	{
 		return 0;
 	}
-
-	public boolean insureCheck()
+	
+	/* Deal one card each to dealer and player 
+	 * Returns: TRUE if Dealer has an ACE and if this is the first card in the hand and FALSE otherwise */
+	public boolean dealCards()
 	{
-		boolean insureChecker = false;
-		Card playerCard1 = d.dealCard();
-		Card dealerCard1 = d.dealCard();
-		if(dealerCard1.show().contains("1"))
+		boolean checkForInsurance = false;
+		Card playerCard = d.dealCard();
+		Card dealerCard = d.dealCard();
+		
+		if( de.isHandEmpty() && dealerCard.show().contains("1"))
 		{
-			insureChecker = true;
+			checkForInsurance = true;
 			
 		}
-		//~ else
-			//~ return insureChecker;
+		
+		p.dealCard(playerCard);
+		de.dealCard(dealerCard);
 	
-		initHands(playerCard1, dealerCard1);
-		return insureChecker;
+		return checkForInsurance;
 	}
 	
-	public void initHands(Card playerCard1, Card dealerCard1)
+	public void playerTurn(boolean didHit)
 	{
-		
-		Card playerCard2 = d.dealCard();
-		Card dealerCard2 = d.dealCard();
-		p.initPlayerHand(playerCard1,playerCard2);
-		de.initDealerCards(dealerCard1,dealerCard2);
-		
-		//after this method was called in the PlayMenu show the image using image(animation & timer)
-	}
-	
-	
-		
-	/*public void showCards()
-	{
-		System.out.println("Player Cards");
-		p.showHand();
-		System.out.println();	
-		
-		System.out.println("Dealer Cards");
-		de.showHand(false);
-		System.out.println();
-	}*/
-	
-	public void playerTurn(boolean decision)
-	{
-		//The current options are to hit and stand
-		if(decision == true)
+		if(didHit)
 		{
 			Card hitting = d.dealCard();
 			p.hit(hitting);
 		}
-		else
-			p.stand();
 		
-		//after this method was called in the PlayMenu show the image using image(animation & timer)	 
+		/* @TODO after this method was called in the PlayMenu show the image using image(animation & timer)	 */
+
 	}
 	
 	public void playerDoubleDown()
 	{
 		Card doubler = d.dealCard();
 		p.hit(doubler);
-		//make sure to double the bet amount in the TrigJack class
+		/* @TODO make sure to double the bet amount in the TrigJack class */
 	}
 	
 	public boolean dealerReveal()
@@ -112,13 +88,13 @@ public class Game
 		//if it returns true send this message ("Let's see the dealer's cards!") or if it is fale return ("You lost this round!")		
 	}
 	
+	/* @TODO do something about the dealtCard */
 	public boolean dealerTurn()
 	{
-		if(de.checkHitOrStand() == true)
+		if(de.mustHit() == true)
 		{
 			//print message the dealer decided to hit!
 			Card dealHit = d.dealCard();
-			totalDealerValue = de.hit(dealHit);
 			return true;
 		}
 		
@@ -133,17 +109,16 @@ public class Game
 	public String determine()
 	{
 		String greater = "false";	//for the dealer
-		totalPlayerValue = p.getPlayerAmount();
-		
-		if(totalDealerValue <= 21 && totalPlayerValue <=21)
+	
+		if(de.getHandValue() <= 21 && p.getPlayerHandValue() <=21)
 		{
-			if(totalDealerValue > totalPlayerValue)
+			if(de.getHandValue() > p.getPlayerHandValue())
 			{
 				//print message the player lost and that he will be directed to the problem page
 				greater = "true";
 			
 			}
-			else if(totalDealerValue < totalPlayerValue)
+			else if(de.getHandValue() < p.getPlayerHandValue())
 			{
 				//print message the player won and how much money he won
 				greater = "false";	
@@ -157,6 +132,34 @@ public class Game
 		
 	}
 	
+	/* @TODO implement initializeGame Start */
+	public boolean initializeGame()
+	{
+		/* Deal a card to player and dealer each */
+		/* Check for Insurance */
+		
+		return false;
+	}
+	
+	
+	/* @TODO Render Player and Dealer Hands */
+	public boolean render(Graphics g, JPanel panel)
+	{
+		de.renderHand(g,panel);
+		p.renderHand(g,panel);
+	}
+	
+	
+	public void showCards()
+	{
+		System.out.println("Player Cards");
+		//p.showHand();
+		System.out.println();	
+		
+		System.out.println("Dealer Cards");
+		//de.showHand();
+		System.out.println();
+	}
 }
 
 
