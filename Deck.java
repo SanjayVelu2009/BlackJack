@@ -26,8 +26,8 @@ import javax.imageio.ImageIO;
 public class Deck
 {
 	private Card[] cardStack = new Card[52];
-		
-	private int topCard;	
+	private int topCard;
+	
 	
 	public Deck()
 	{
@@ -79,25 +79,24 @@ public class Deck
 	
 	public void shuffleDeck()
 	{
-		int b;
-		String swapImage = "";
+		int b;		
 		
-		
-		for(int a = 0; a<nameStack.length; a++)
+		for(int a = 0; a<cardStack.length; a++)
 		{
-			b = (int)(Math.random()*(51));
+			b = (int)(Math.random()*(cardStack.length-1));
 			
 			if(b != a)
 			{
+				// Shuffling deck
 				Card swapCard = cardStack[a];
 				cardStack[a] = cardStack[b];
 				cardStack[b] = swapCard;
-				//shuffling Card deck
 			}
 			else
 				a--;
-			
-		}		
+		}	
+		
+		topCard = 0;	
 	}
 			
 
