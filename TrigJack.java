@@ -539,8 +539,8 @@ class PlayMenu extends JPanel
 		////////////////////////////////////////////////////////////////
 		
 		
-        betting = new JSlider(0,2000,0);
-        betting.setMajorTickSpacing(200);
+        betting = new JSlider(0, 5000,0);
+        betting.setMajorTickSpacing(1000);
 	    betting.setPaintLabels(true);
 	    betting.setFont(new Font("Serif", Font.PLAIN,15));
 	    betting.setForeground(new Color(255, 215, 0));
@@ -667,7 +667,7 @@ class PlayMenu extends JPanel
 		//deck.shuffleDeckAndImage(); //shuffles deck array and image array
 		
 		
-		JOptionPane.showMessageDialog(PlayMenu.this, "The dealer has an Ace, would you like to pay insureance? If yes go to the menu and click on the insureance button.");
+		//JOptionPane.showMessageDialog(PlayMenu.this, "The dealer has an Ace, would you like to pay insureance? If yes go to the menu and click on the insureance button.");
 		
 		//do the message stuff using the JDropDownMenu and get input using JOPtionPane again
 		
@@ -728,7 +728,7 @@ class PlayMenu extends JPanel
 		/*@TODO import graphics and JPanel to the necessery classes */
 		super.paintComponent(g);
 		
-		game.render(g,centerPanel); 
+		//game.render(g,centerPanel); 
 		
 		if (backgroundImage2 != null && imageChecker == false)
 		{
