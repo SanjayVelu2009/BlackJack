@@ -630,7 +630,7 @@ class PlayMenu extends JPanel
 		//create a really small JTextArea to show amount bet and total amount of money 
 		//betMoney method does that
 		//betMoney();
-		//initAndShuffleDeck();
+		initAndShuffleDeck();
 		//initHands
 		//insuranceOption
 		//playerTurn
@@ -654,7 +654,7 @@ class PlayMenu extends JPanel
     public void betMoney()
     {
 		
-		totalAmt = game.placeBet();
+		//totalAmt = game.placeBet();
 		
 		//pass this into a method and if they won add amtBet to current balance, update, and do vice versa
 	}
