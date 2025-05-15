@@ -3,42 +3,36 @@ public class Player
 {
 	
 	private String name;
-	private Card[] drawnCards;
+	private Card[] playerHand;
 	private int numCards;
 	private int currentBalance;
-	private int amountBet;
-	private int jackChecker;
 	
 	
 	public Player(String inName)
 	{
-		drawnCards = new Card[10];
+		playerHand = new Card[10];
 		currentBalance = 10000;
-		amountBet = -1;
 		numCards = 0;
 		name = inName;
 		
 	}
 	
-	public void initPlayerHand(Card card1, Card card2)
+	public void dealCard(Card c)
 	{
-		drawnCards[0] = card1;
-		numCards++;
-		
-		
-		drawnCards[1] = card2;
+		playerHand[numCards] = c;
 		numCards++;
 	}
 	
 	public String showHand(int i)
 	{
 		String card = "";
-		card = drawnCards[i].show();
+		card = playerHand[i].show();
 		return card;
 	}
+	
 	public void hit(Card c)
 	{
-		drawnCards[numCards] = c;
+		playerHand[numCards] = c;
 		numCards++;	
 	}
 	
@@ -50,62 +44,60 @@ public class Player
 	public void split()
 	{
 		
-		if((drawnCards[0].getType() == drawnCards[1].getType()) && (drawnCards[0].getValue() == drawnCards[1].getValue()))
+		if((playerHand[0].getType() == playerHand[1].getType()) && 
+		   (playerHand[0].getValue() == playerHand[1].getValue()))
 		{
 			Card[] splitHand = new Card[2];
-			splitHand[0] = drawnCards[1];
+			splitHand[0] = playerHand[1];
 		}
 		else
 			System.out.println("Cards are not the same!");
 		
 	}
 	
-	public int placeBet(int amt, boolean game)
+	/* @TODO Add checks to enforce amt>minimumBet */
+	public int placeBet(int amt)
 	{
-		
+		int amountBet = 0;
 		
 		if (currentBalance >= amt)
 		{
 			amountBet = amt;
-			/*amountBet += amt;
 			currentBalance -= amountBet;	
-			betSuccess = true;*/
 		}
 		
-		if(game == true)
-		{
-			currentBalance+=amt;
-		}
-
-			
 		return amountBet;
-		
 	}
 	
+	/* @TODO need to understand how checkBlackJack is used */
 	public boolean checkBlackJack()
 	{
-		jackChecker = 0;
-		for(int i = 0; i<numCards; i++)
+		if(getPlayerHandValue() <= 21)
 		{
-			jackChecker+=drawnCards[i].getValue();
-		}
-		
-		if(jackChecker <= 21)
-		{
-			System.out.println("You didn't Bust!");
 			return true;
 		}
 		else
 		{
-			System.out.println("You Busted!");
 			return false;
 		}
 		
+	}
+	
+	/* @TODO Render Player Hand image */
+	public void renderHand(Graphics g, JPanel panel)
+	{
 		
 	}
 	
-	public int getPlayerAmount()
+	public int getPlayerHandValue()
 	{
-		return jackChecker;
+		int totalPlayerValue = 0;
+		
+		for(int i = 0; i<numCards-1; i++)
+		{
+			totalPlayerValue += playerHand[i].getValue();
+		}
+		
+		return totalPlayerValue;
 	}
 }
