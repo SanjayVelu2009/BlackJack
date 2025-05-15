@@ -1,3 +1,5 @@
+import javax.swing.JPanel;
+import java.awt.Graphics;
 public class Dealer
 {
 	Card[] dealerHand;
@@ -77,8 +79,15 @@ public class Dealer
 		
 		
 	/* @TODO Render Dealer Hand image */
-	public void renderHand(Graphics g, JPanel panel)
+	public void renderHand(Graphics g, JPanel panel, boolean flip)
 	{
+		Card cardImage;
 		
+		for(int i = 0; i<dealerHand.length; i++)
+		{
+			cardImage = dealerHand[i]; 
+			cardImage.render(g,panel);
+		}
+				
 	}
 }
