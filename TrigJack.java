@@ -724,6 +724,7 @@ class PlayMenu extends JPanel
     
 	public void paintComponent(Graphics g)
 	{
+		/*@TODO import graphics and JPanel to the necessery classes */
 		super.paintComponent(g);
 		
 		game.render(g,centerPanel); 
