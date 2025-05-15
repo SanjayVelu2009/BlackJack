@@ -1,4 +1,5 @@
-
+import javax.swing.JPanel;
+import java.awt.Graphics;
 public class Game
 {
 
@@ -27,10 +28,12 @@ public class Game
 	}
 	
 
-	/* @TODO Add logic for player to place bet? Should there be a minimum bet enforcement? */
-	public int placeBet()
+	/* @DONE Add logic for player to place bet? Should there be a minimum bet enforcement? */
+	public int placeBet(int amt)
 	{
-		return 0;
+		int amountBet = 0;
+		amountBet = p.placeBet(amt);
+		return amountBet;
 	}
 	
 	/* Deal one card each to dealer and player 
@@ -88,13 +91,14 @@ public class Game
 		//if it returns true send this message ("Let's see the dealer's cards!") or if it is fale return ("You lost this round!")		
 	}
 	
-	/* @TODO do something about the dealtCard */
+	/* @DONE do something about the dealtCard */
 	public boolean dealerTurn()
 	{
 		if(de.mustHit() == true)
 		{
 			//print message the dealer decided to hit!
 			Card dealHit = d.dealCard();
+			de.hit(dealHit);
 			return true;
 		}
 		
@@ -138,15 +142,19 @@ public class Game
 		/* Deal a card to player and dealer each */
 		/* Check for Insurance */
 		
-		return false;
+		
+		
+		
+		//return false;
 	}
 	
 	
 	/* @TODO Render Player and Dealer Hands */
-	public boolean render(Graphics g, JPanel panel)
+	public void render(Graphics g, JPanel panel)
 	{
-		de.renderHand(g,panel);
-		p.renderHand(g,panel);
+		de.renderHand(g,panel,true);
+		//p.renderHand(g,panel);
+		
 	}
 	
 	
@@ -161,7 +169,6 @@ public class Game
 		System.out.println();
 	}
 }
-
 
 
 
