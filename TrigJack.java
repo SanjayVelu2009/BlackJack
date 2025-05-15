@@ -579,6 +579,7 @@ class PlayMenu extends JPanel
 	   
 		JMenuItem insure = new JMenuItem("insurance");
 		JMenuItem doubleDown = new JMenuItem("double down");
+		JMenuItem restart = new JMenuItem("restart");
 		//JMenuItem split = new JMenuItem("split");
 		
 		menuOpt = new JMenu("Options");
