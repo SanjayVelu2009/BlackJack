@@ -1,5 +1,7 @@
 import javax.swing.JPanel;
 import java.awt.Graphics;
+import java.awt.*;
+
 public class Dealer
 {
 	Card[] dealerHand;
@@ -76,18 +78,18 @@ public class Dealer
 		
 		return totalValue;
 	}
-		
-		
-	/* @TODO Render Dealer Hand image */
-	public void renderHand(Graphics g, JPanel panel, boolean flip)
+	
+	/* Render Card images to the panel */
+	public void renderHand(Graphics g, JPanel panel, boolean hideSecond)
 	{
-		Card cardImage;
+		Card dealerCard;
+		boolean hideThisCard = false;
 		
-		for(int i = 0; i<dealerHand.length; i++)
-		{
-			cardImage = dealerHand[i]; 
-			cardImage.render(g,panel);
-		}
-				
+		for(int i = 0; i<numCards; i++)
+		{		
+			hideThisCard = ((hideSecond) && (i==1));
+			dealerCard = dealerHand[i]; 
+			dealerCard.render(g,panel, (i*200)+50, 50, hideThisCard);
+		}			
 	}
 }
