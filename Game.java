@@ -1,5 +1,7 @@
 import javax.swing.JPanel;
 import java.awt.Graphics;
+import java.awt.*;
+
 public class Game
 {
 
@@ -28,7 +30,6 @@ public class Game
 	}
 	
 
-	/* @DONE Add logic for player to place bet? Should there be a minimum bet enforcement? */
 	public int placeBet(int amt)
 	{
 		int amountBet = 0;
@@ -38,41 +39,45 @@ public class Game
 	
 	/* Deal one card each to dealer and player 
 	 * Returns: TRUE if Dealer has an ACE and if this is the first card in the hand and FALSE otherwise */
-	public boolean dealCards()
+	public boolean dealCards(boolean playerOnly)
 	{
 		boolean checkForInsurance = false;
-		Card playerCard = d.dealCard();
-		Card dealerCard = d.dealCard();
 		
-		if( de.isHandEmpty() && dealerCard.show().contains("1"))
+		if (!playerOnly)
 		{
-			checkForInsurance = true;
-			
+			Card dealerCard = d.dealCard();
+			if( de.isHandEmpty() && dealerCard.show().contains("1"))
+			{
+				checkForInsurance = true;
+			}
+			de.dealCard(dealerCard);
 		}
-		
-		p.dealCard(playerCard);
-		de.dealCard(dealerCard);
-	
-		return checkForInsurance;
-	}
-	
-	public void playerTurn(boolean didHit)
-	{
-		if(didHit)
-		{
-			Card hitting = d.dealCard();
-			p.hit(hitting);
-		}
-		
-		/* @TODO after this method was called in the PlayMenu show the image using image(animation & timer)	 */
 
+		Card playerCard = d.dealCard();
+		p.dealCard(playerCard);
+
+		return checkForInsurance;
 	}
 	
 	public void playerDoubleDown()
 	{
-		Card doubler = d.dealCard();
-		p.hit(doubler);
 		/* @TODO make sure to double the bet amount in the TrigJack class */
+	}
+	
+	public boolean playerBustCheck()
+	{
+		int playerValue = p.getPlayerHandValue();
+		//System.out.println(playerValue);
+		
+		if(playerValue > 21)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+		
 	}
 	
 	public boolean dealerReveal()
@@ -135,25 +140,14 @@ public class Game
 		return greater;
 		
 	}
-	
-	/* @TODO implement initializeGame Start */
-	public boolean initializeGame()
-	{
-		/* Deal a card to player and dealer each */
-		/* Check for Insurance */
 		
-		
-		
-		
-		//return false;
-	}
-	
-	
 	/* @TODO Render Player and Dealer Hands */
-	public void render(Graphics g, JPanel panel)
+	public void render(Graphics g, JPanel panel, boolean hideIn)
 	{
-		de.renderHand(g,panel,true);
-		//p.renderHand(g,panel);
+		boolean hide = hideIn;
+		
+		de.renderHand(g,panel,hide);
+		p.renderHand(g,panel);
 		
 	}
 	
@@ -169,6 +163,5 @@ public class Game
 		System.out.println();
 	}
 }
-
 
 
