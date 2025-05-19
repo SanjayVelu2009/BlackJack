@@ -12,6 +12,9 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.CardLayout;
 import java.awt.*;
+import javax.swing.*;
+import java.awt.event.*;
+import java.io.*;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -462,7 +465,7 @@ class Names extends JPanel implements ActionListener
     }
 }
 
-class PlayMenu extends JPanel
+class PlayMenu extends JPanel implements ActionListener
 {
 	private JSlider betting;
 	private JMenu menuOpt;
@@ -473,6 +476,7 @@ class PlayMenu extends JPanel
 	private JButton allIn;
 	private JButton hit;
 	private JButton stand;
+	private JButton Test;
 	
     private TrigJackHolder trigHolder;
     private CardLayout cards;
@@ -500,6 +504,15 @@ class PlayMenu extends JPanel
 		trigHolder = trigHolderIn;
 		cards = cardsIn;
            
+        try
+        {
+            backgroundImage2 = ImageIO.read(new File("instructions.jpeg"));
+        }
+        catch (IOException e)
+        {
+            System.err.println("Background image not found: " + e.getMessage());
+            setBackground(new Color(53, 0, 77));
+        }
         /*Main Panels*/   
         setLayout(new BorderLayout());
         setBackground(new Color(53, 101, 77));
@@ -509,6 +522,10 @@ class PlayMenu extends JPanel
 		createBetSlider();
 	    createMainMenu();   
 		createButtons();
+		
+		Test = new JButton("Test");
+		Test.addActionListener(this);
+		add(Test, BorderLayout.EAST);
 		
         gameState = false;
 		
@@ -666,6 +683,14 @@ class PlayMenu extends JPanel
 		name = naming;
 		System.out.println(name);
 	}
+	
+	public void actionPerformed(ActionEvent evt)
+    {
+        if (evt.getActionCommand().equals("Test"))
+        {
+            cards.show(trigHolder, "Problem");
+        }
+    }
     
 	
 	class CardsPanel extends JPanel
@@ -686,20 +711,6 @@ class PlayMenu extends JPanel
 			
 		}
 	}
-}
-
-class Problem extends JPanel
-{
-    public Problem(TrigJackHolder trigHolderIn, CardLayout cardsIn)
-    {
-        setLayout(null);
-        setBackground(new Color(53, 101, 77));
-
-        JLabel label = new JLabel("Problem Page");
-        label.setBounds(350, 350, 200, 30);
-        label.setForeground(Color.WHITE);
-        add(label);
-    }
 }
 
 class Solution extends JPanel
