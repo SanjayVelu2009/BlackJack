@@ -11,6 +11,7 @@ import java.awt.GridLayout;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.CardLayout;
+import java.awt.*;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -141,7 +142,7 @@ class StartMenu extends JPanel implements ActionListener
         try
         {
 			//for loop
-				backgroundImage = ImageIO.read(new File("background.jpeg"));
+			backgroundImage = ImageIO.read(new File("background.jpeg"));
             //array.append(backgroundImage)
         }
         catch (IOException e)
@@ -488,95 +489,81 @@ class PlayMenu extends JPanel
     private int moneyAmt;
     private int totalAmt;
     private boolean gameState;
-   // private Deck deck = new Deck();
-    //private Dealer dealer = new Dealer();
-    
-    private String[] playerCards = new String[3];
-    private String[] dealerCards = new String[3];
-    private int insureAmount = 0;
-	private Image cardImage;
-	private boolean imageChecker = false;
+
 	private JPanel centerPanel;
+	private JPanel buttonPanel;
+	
+	private boolean hide = true;
 	
     public PlayMenu(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
 		trigHolder = trigHolderIn;
 		cards = cardsIn;
-		try
-        {
-            backgroundImage2 = ImageIO.read(new File("playMenu.jpeg"));
-        }
-        catch (IOException e)
-        {
-            System.err.println("Background image not found: " + e.getMessage());
-            setBackground(new Color(53, 101, 77));
-        }
            
-        
-        moneyTrack = new JLabel("Amount Bet $0");
-		moneyTrack.setForeground(Color.WHITE);
-        
         /*Main Panels*/   
         setLayout(new BorderLayout());
         setBackground(new Color(53, 101, 77));
 		
-		JPanel northPanel = new JPanel();
-		northPanel.setLayout(new BorderLayout());
-		add(northPanel, BorderLayout.NORTH);
+		CardsPanel cp = new CardsPanel();
+			
+		createBetSlider();
+	    createMainMenu();   
+		createButtons();
 		
-		JPanel westPanel = new JPanel();
-		westPanel.setLayout(new BorderLayout());
-		add(westPanel, BorderLayout.WEST);
+        gameState = false;
 		
-		centerPanel = new JPanel();
-		centerPanel.setLayout(new GridLayout(2,3));
-		add(centerPanel, BorderLayout.CENTER);
+		saveName(name);
+		game = new Game(name);
+				
+		boolean insurance = game.dealCards(false);
 		
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.setLayout(new GridLayout(2,1));
+		if (insurance)
+		{
+			
+		}
+		
+		game.dealCards(false);
+		
+		add(menuBar,BorderLayout.NORTH);
+		add(betting,BorderLayout.SOUTH);
+		add(cp, BorderLayout.CENTER);
 		add(buttonPanel, BorderLayout.WEST);
 		
-		////////////////////////////////////////////////////////////////
+		//saveName(name);
+		//create a really small JTextArea to show amount bet and total amount of money 
+		//betMoney method does that
+		//betMoney();
+		//initAndShuffleDeck();
+		//initHands
+		//insuranceOption
+		//playerTurn
+		//dealerTurn
+		//determine who won
+		//settleAmount
+		//problem if needed
+		//solution if needed
+		//playAgain
+		//when implementing double down don't forget to double the bet amount
 		
-		
-        betting = new JSlider(0, 5000,0);
-        betting.setMajorTickSpacing(1000);
-	    betting.setPaintLabels(true);
-	    betting.setFont(new Font("Serif", Font.PLAIN,15));
-	    betting.setForeground(new Color(255, 215, 0));
-	    betting.setOrientation(JSlider.HORIZONTAL);
-	    
-	    /* @TODO create Home Button and add to JMenu(cardLayout)
-	     * @DONE create Center Panel with Grid Layout */
-	    
-	    /* @TODO adjust slider for the minimum to be 5000*/
-	    class SliderControl implements ChangeListener
-	    {
-			public void stateChanged(ChangeEvent evt)
-			{
-				moneyAmt = betting.getValue();
-				
-				if (moneyAmt > 0)
-				{
-					moneyTrack.setText(" Amount Bet $" + moneyAmt);
-					repaint();
-				}
-				else if (moneyAmt == 0)
-				{
-					moneyTrack.setText("Amount Bet $0");
-					repaint();
-				}
-			}
-		}
-	    
-	    betting.addChangeListener(new SliderControl());
-	    
-	    JPanel labelPanel = new JPanel();
-		labelPanel.setLayout(null);
-		add(labelPanel, BorderLayout.EAST);
-		labelPanel.add(moneyTrack);
-		moneyTrack.setBounds(700,500,100,50);		
-	   
+		repaint();
+    }
+    
+    public void createButtons()
+    {
+		buttonPanel = new JPanel();
+		buttonPanel.setLayout(new GridLayout(2,1));		
+		hit = new JButton("HIT");
+		hit.addActionListener(new ButtonControl());
+		styler.styleButton(hit);
+		stand = new JButton("STAND");
+		stand.addActionListener(new ButtonControl());
+		styler.styleButton(stand);		
+		buttonPanel.add(hit);
+		buttonPanel.add(stand);
+	}
+    
+    public void createMainMenu()
+    {
 		JMenuItem insure = new JMenuItem("insurance");
 		JMenuItem doubleDown = new JMenuItem("double down");
 		JMenuItem restart = new JMenuItem("restart");
@@ -591,157 +578,114 @@ class PlayMenu extends JPanel
 		
 		menuBar = new JMenuBar();
 		menuBar.add(menuOpt);
+	}
+	
+    public void createBetSlider()
+    {
+		betting = new JSlider(0, 5000,0);
+        betting.setMajorTickSpacing(1000);
+	    betting.setPaintLabels(true);
+	    betting.setFont(new Font("Serif", Font.PLAIN,15));
+	    betting.setForeground(new Color(255, 215, 0));
+	    betting.setOrientation(JSlider.HORIZONTAL);
+	    
+	    /* @TODO create Home Button and add to JMenu(cardLayout)
+	     * @DONE create Center Panel with Grid Layout */
+	    
+	    betting.addChangeListener(new SliderControl());
+	}
+    
+    /* @TODO adjust slider for the minimum to be 5000*/
+	class SliderControl implements ChangeListener
+	{
+		public void stateChanged(ChangeEvent evt)
+		{
+			moneyAmt = betting.getValue();
+				
+			if (moneyAmt > 0)
+			{
+				moneyTrack.setText(" Amount Bet $" + moneyAmt);
+				repaint();				
+			}
+			else if (moneyAmt == 0)
+			{
+				moneyTrack.setText("Amount Bet $0");
+				repaint();
+			}
+		}
+	}
+	
+	
 		
+	class ButtonControl implements ActionListener
+	{
+		public void actionPerformed(ActionEvent evt)
+		{
+			if(evt.getActionCommand().equals("HIT"))
+			{
+				game.dealCards(true);
+				
+				repaint();
+				
+				boolean checkingBlackJack = game.playerBustCheck();
+				
+				if(checkingBlackJack == true)
+				{
+					System.out.println("Player busted");
+					JOptionPane.showMessageDialog(null, "YOU BUSTED");
+					hide = false; 
+					//repaint();
+				}
+				
+				repaint();
+			}
+			
+			else if(evt.getActionCommand().equals("STAND"))
+			{
+				//System.out.println("stand");
+				hide = false;
+				repaint();
+				
+				//dealer turn determines hit or stand
+				/*if(game.dealerTurn())
+				{
+					JOptionPane.showMessageDialog(null,"Dealer decided to hit");
+					repaint();
+				}
+				else
+					JOptionPane.showMessageDialog(null,"Dealer turn is over!");*/
+				
+			}
 		
-		hit = new JButton("HIT");
-		styler.styleButton(hit);
-		stand = new JButton("STAND");
-		styler.styleButton(stand);
-		
-        
-        //int currentMoney = game.totalMoney() - betting.getValue();
-        
-        //tArea.setText(" Current Balance " + (currentMoney) +"\n"
-        
-        gameState = false;
-		
-		buttonPanel.add(hit);
-		buttonPanel.add(stand);
-		
-		add(betting,BorderLayout.SOUTH);
-		add(menuBar,BorderLayout.NORTH);
-		
-		saveName(name);
-		game = new Game(name);
-		
-		
-		/* @TODO Game Logic
-		/* Player is created, Name is saved, Dealer is created, Deck is created and shuffled.
-		 * initializeGame
-		 * Display cards 
-		 * Take action on Insurance 
-		 * Deal second card
-		 * */
-		
-		
-		
-		
-		
-		//saveName(name);
-		//create a really small JTextArea to show amount bet and total amount of money 
-		//betMoney method does that
-		//betMoney();
-		initAndShuffleDeck();
-		//initHands
-		//insuranceOption
-		//playerTurn
-		//dealerTurn
-		//determine who won
-		//settleAmount
-		//problem if needed
-		//solution if needed
-		//playAgain
-		//when implementing double down don't forget to double the bet amount
-		
-    }
+				
+		}
+	}
     
     public void saveName(String naming)
     {
 		name = naming;
-		//player = new Player(name);
 		System.out.println(name);
 	}
     
-    public void betMoney()
-    {
-		
-		//totalAmt = game.placeBet();
-		
-		//pass this into a method and if they won add amtBet to current balance, update, and do vice versa
-	}
 	
-	
-	public void initAndShuffleDeck()
+	class CardsPanel extends JPanel
 	{
-		//deck.initializeDeck();	//initializes decks
-		//deck.shuffleDeckAndImage(); //shuffles deck array and image array
-		
-		
-		//JOptionPane.showMessageDialog(PlayMenu.this, "The dealer has an Ace, would you like to pay insureance? If yes go to the menu and click on the insureance button.");
-		
-		//do the message stuff using the JDropDownMenu and get input using JOPtionPane again
-		
-		
-		/* for(int i = 0; i<2; i++)
+		public CardsPanel()
 		{
-			playerCards[i] = game.(i);	//saving image strings
-			
-			dealerCards[i] = game.getDealerCardName(i);
-			
+			//setLayout(new GridLayout(2,3));
+			setBackground(new Color(53,101,77));
+			repaint();
 		}
 		
-		imageChecker = true; */
-		
-		repaint();
-	}
-	
-
-	
-
-	/*public void playerTurn()
-	{
-		
-	}
-	
-	public void dealerTurn()
-	{
-	
-	}
-	
-	public void determineWhoWon()
-	{
-		
-	}
-	
-	public void settleAmount()
-	{
-	
-	}
-	
-	public void problemIfNeeded()
-	{
-	
-	}
-	
-	public void solutionIfNeeded()
-	{
-	
-	}
-	
-	public void playAgain()
-	{
-	
-	}*/
-    
-	public void paintComponent(Graphics g)
-	{
-		/*@TODO import graphics and JPanel to the necessery classes */
-		super.paintComponent(g);
-		
-		//game.render(g,centerPanel); 
-		
-		if (backgroundImage2 != null && imageChecker == false)
+		public void paintComponent(Graphics g)
 		{
-			//g.drawImage(backgroundImage2, 0, 0, getWidth(), getHeight(), this);
+			
+			super.paintComponent(g);
+			
+			game.render(g, this, hide);
+			
 		}
-		g.drawRect(100, 100, 200, 20);
-		//if (cardImage != null)
-		//{
-			/*@TODO instead of this pass in center panel when calling render so, in drawImage for card we can pass in the center panel object instead of this*/
-			//g.drawImage(cardImage, 500, 300, 200, 300, this);
-		//}
 	}
-    
 }
 
 class Problem extends JPanel
