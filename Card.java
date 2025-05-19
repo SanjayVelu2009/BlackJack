@@ -6,12 +6,15 @@ import javax.imageio.ImageIO;
 import java.io.FileWriter;
 import javax.swing.JPanel;
 import java.awt.Graphics;
+import java.awt.*;
+
 
 public class Card
 {
 	private int value;
 	private char type;
 	private Image cardImage;
+	private Image cardBackImage;
  
 	
 	public Card (int inVal, char inType)
@@ -19,6 +22,7 @@ public class Card
 		value = inVal;
 		type = inType;
 		cardImage = readImg(getCardImgFileName());
+		cardBackImage = readImg("card_back.jpg");
 		
 	}
 	
@@ -30,9 +34,10 @@ public class Card
 	
 	private Image readImg(String cardName)
 	{
+		Image img = null;
 		try
 		{
-			cardImage = ImageIO.read(new File(cardName));
+			img = ImageIO.read(new File(cardName));
 		}
 		catch(IOException e)
 		{
@@ -40,7 +45,7 @@ public class Card
 			e.printStackTrace();
 		}
 		
-		return cardImage;
+		return img;
 	}
 	
 	public int getValue()
@@ -65,10 +70,16 @@ public class Card
 		return cardImage;
 	}
 	
-	/* @TODO Render card image */
-	public void render(Graphics g, JPanel panel)
+	public void render(Graphics g, JPanel panel, int xpos, int ypos, boolean hide)
 	{
-		g.drawImage(getImage(),150,150,100,100,panel);
+		if (!hide)
+		{
+			g.drawImage(cardImage,xpos,ypos,cardImage.getWidth(panel)/4,cardImage.getHeight(panel)/4, panel);
+		}
+		else
+		{	
+			g.drawImage(cardBackImage,xpos,ypos,cardBackImage.getWidth(panel)/4,cardBackImage.getHeight(panel)/4, panel);
+		}
 	}
 	
 	public String show()
