@@ -1,5 +1,7 @@
 import javax.swing.JPanel;
 import java.awt.Graphics;
+import java.awt.*;
+
 
 public class Player
 {
@@ -30,12 +32,6 @@ public class Player
 		String card = "";
 		card = playerHand[i].show();
 		return card;
-	}
-	
-	public void hit(Card c)
-	{
-		playerHand[numCards] = c;
-		numCards++;	
 	}
 	
 	public void stand()
@@ -85,14 +81,13 @@ public class Player
 		
 	}
 	
-	/* @TODO Render Player Hand image */
 	public void renderHand(Graphics g, JPanel panel)
 	{
 		Card playerCard;
-		for(int i = 0; i<playerHand.length; i++)
+		for(int i = 0; i<numCards; i++)
 		{
 			playerCard = playerHand[i];
-			playerCard.render(g, panel);
+			playerCard.render(g, panel, (i*200)+50, 400, false);
 		}
 	}
 	
@@ -100,9 +95,10 @@ public class Player
 	{
 		int totalPlayerValue = 0;
 		
-		for(int i = 0; i<numCards-1; i++)
+		for(int i = 0; i<numCards; i++)
 		{
 			totalPlayerValue += playerHand[i].getValue();
+			System.out.println(totalPlayerValue);
 		}
 		
 		return totalPlayerValue;
