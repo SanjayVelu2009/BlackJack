@@ -20,12 +20,6 @@ public class Dealer
 		numCards++;
 	}
 	
-	public void hit(Card dealerHit)
-	{
-		dealerHand[numCards-1] = dealerHit;
-		numCards++;	
-	}
-	
 	public String showHand(int i)
 	{
 		String card = dealerHand[i].show();
@@ -33,7 +27,7 @@ public class Dealer
 		return card;
 	}
 	
-	/* @TODO need to understand how checkDealerBlackJack is used */
+	/* @TODO checkDealerBlackJack not used anywhere. Remove? */
 	public boolean checkDealerBlackJack()
 	{
 		if((getHandValue()) <= 21)
@@ -70,11 +64,21 @@ public class Dealer
 	public int getHandValue()
 	{
 		int totalValue = 0;
+		boolean handHasAce = false;
 		
-		for(int i = 0; i<numCards-1; i++)
+		for(int i = 0; i<numCards; i++)
 		{
 			totalValue += dealerHand[i].getValue();
+			
+			if(dealerHand[i].getValue() == 1)
+				handHasAce = true;
+			System.out.println(totalValue+ "Value at each iteration");
 		}
+			
+		if (handHasAce && totalValue <= 10)
+			totalValue += 10;
+		
+		System.out.println(totalValue+ "End Value of each hand");
 		
 		return totalValue;
 	}
