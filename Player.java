@@ -66,6 +66,12 @@ public class Player
 		return amountBet;
 	}
 	
+	public void addBet(int amt)
+	{
+		amt = 2*(amt);
+		currentBalance += amt;
+	}
+	
 	public boolean checkBlackJack()
 	{
 		if(getPlayerHandValue() <= 21)
@@ -77,6 +83,16 @@ public class Player
 			return false;
 		}
 		
+	}
+	
+	public boolean playerWinOrLose()
+	{
+		if(currentBalance <= 0)
+		{
+			return true;
+		}
+		else
+			return false;
 	}
 	
 	public void renderHand(Graphics g, JPanel panel)
