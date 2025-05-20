@@ -107,7 +107,7 @@ class TrigJackHolder extends JPanel
         Instructions ins = new Instructions(this, card);
         Highscores hs = new Highscores(this, card);
         PlayMenu pm = new PlayMenu(this, card);
-        Problem prob = new Problem(this, card);
+        //Problem prob = new Problem(this, card);
         Solution sol = new Solution(this, card);
         Names nam = new Names(this, card);
 
@@ -115,7 +115,7 @@ class TrigJackHolder extends JPanel
         add(ins, "Instructions");
         add(hs, "Highscores");
         add(pm, "Playing");
-        add(prob, "Problem");
+        //add(prob, "Problem");
         add(sol, "Solution");
         add(nam, "Name");
 
@@ -477,6 +477,7 @@ class PlayMenu extends JPanel implements ActionListener
 	private JButton hit;
 	private JButton stand;
 	private JButton Test;
+	private JButton home;
 	
     private TrigJackHolder trigHolder;
     private CardLayout cards;
@@ -491,7 +492,7 @@ class PlayMenu extends JPanel implements ActionListener
     private String name = "";
     private Player player;
     private int moneyAmt;
-    private int totalAmt;
+    private int insureAmt;
     private boolean gameState;
 
 	private JPanel centerPanel;
@@ -520,6 +521,7 @@ class PlayMenu extends JPanel implements ActionListener
 		CardsPanel cp = new CardsPanel();
 			
 		createBetSlider();
+		createBettingLabels();
 	    createMainMenu();   
 		createButtons();
 		
@@ -534,10 +536,14 @@ class PlayMenu extends JPanel implements ActionListener
 				
 		boolean insurance = game.dealCards(false);
 		
+		//JOptionPane.showMessageDialog(null,"Please place your bet, use the slider to determine how much you would like to bet!");
+		
 		if (insurance)
 		{
-			
+			JOptionPane.showMessageDialog(null,"The Dealer has an Ace! Would you like to pay insurance, if so click on options, then click on insurance!");
 		}
+		
+		
 		
 		game.dealCards(false);
 		
@@ -565,10 +571,20 @@ class PlayMenu extends JPanel implements ActionListener
 		repaint();
     }
     
+    /* @TODO create Labels to reflect Pot Value and Players' current balance 
+     * @TODO Position the labels right below the cards and above the slider */
+    public void createBettingLabels()
+    {
+		JLabel potValue = new JLabel(moneyAmt);
+		//write
+		
+	} 
+    
+    /* @TODO Add another button called "Bet" to read from slider and commit the bet to Pot Value */
     public void createButtons()
     {
 		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new GridLayout(2,1));		
+		buttonPanel.setLayout(new GridLayout(3,1));		
 		hit = new JButton("HIT");
 		hit.addActionListener(new ButtonControl());
 		styler.styleButton(hit);
@@ -577,6 +593,10 @@ class PlayMenu extends JPanel implements ActionListener
 		styler.styleButton(stand);		
 		buttonPanel.add(hit);
 		buttonPanel.add(stand);
+		home = new JButton("HOME");
+		home.addActionListener(new ButtonControl());
+		styler.styleButton(home);
+		buttonPanel.add(home);
 	}
     
     public void createMainMenu()
@@ -599,40 +619,30 @@ class PlayMenu extends JPanel implements ActionListener
 	
     public void createBetSlider()
     {
-		betting = new JSlider(0, 5000,0);
+		betting = new JSlider(5000, 10000,5000);
         betting.setMajorTickSpacing(1000);
 	    betting.setPaintLabels(true);
 	    betting.setFont(new Font("Serif", Font.PLAIN,15));
 	    betting.setForeground(new Color(255, 215, 0));
 	    betting.setOrientation(JSlider.HORIZONTAL);
-	    
-	    /* @TODO create Home Button and add to JMenu(cardLayout)
-	     * @DONE create Center Panel with Grid Layout */
-	    
+	    	    
 	    betting.addChangeListener(new SliderControl());
 	}
     
-    /* @TODO adjust slider for the minimum to be 5000*/
+    
+    /* @TODO Create and Update a JLabel to reflect Player Balance and Pot Value
+     * @TODO Use Slider to set the bet, but only read when user hits a button "Bet" */
 	class SliderControl implements ChangeListener
 	{
 		public void stateChanged(ChangeEvent evt)
 		{
 			moneyAmt = betting.getValue();
-				
-			if (moneyAmt > 0)
-			{
-				moneyTrack.setText(" Amount Bet $" + moneyAmt);
-				repaint();				
-			}
-			else if (moneyAmt == 0)
-			{
-				moneyTrack.setText("Amount Bet $0");
-				repaint();
-			}
+			moneyAmt = game.placeBet(moneyAmt);
+			
+			//JOptionPane.showMessageDialog(null," Amount Bet $" + moneyAmt);
+							
 		}
 	}
-	
-	
 		
 	class ButtonControl implements ActionListener
 	{
@@ -643,38 +653,44 @@ class PlayMenu extends JPanel implements ActionListener
 				game.dealCards(true);
 				
 				repaint();
+				JOptionPane.showMessageDialog(null, "You HIT! Press stand if you want to end your turn!");
 				
 				boolean checkingBlackJack = game.playerBustCheck();
 				
 				if(checkingBlackJack == true)
 				{
 					System.out.println("Player busted");
-					JOptionPane.showMessageDialog(null, "YOU BUSTED");
 					hide = false; 
-					//repaint();
+					repaint();
+					JOptionPane.showMessageDialog(null, "YOU BUSTED");
 				}
-				
-				repaint();
 			}
-			
 			else if(evt.getActionCommand().equals("STAND"))
 			{
-				//System.out.println("stand");
 				hide = false;
-				repaint();
 				
 				//dealer turn determines hit or stand
-				/*if(game.dealerTurn())
+				if(game.dealerTurn())
 				{
-					JOptionPane.showMessageDialog(null,"Dealer decided to hit");
-					repaint();
+					JOptionPane.showMessageDialog(null,"Dealer decided to Hit");
 				}
 				else
-					JOptionPane.showMessageDialog(null,"Dealer turn is over!");*/
+				{
+					JOptionPane.showMessageDialog(null,"Dealer turn is over!");
+				}
+				repaint();
 				
+				if(game.determine().equals("true"))
+					JOptionPane.showMessageDialog(null,"You Lost this round, time to solve a problem!");
+				else if(game.determine().equals("false"))
+					JOptionPane.showMessageDialog(null,"You won this round!");
+				else
+					JOptionPane.showMessageDialog(null,"It's a push! You and the dealer have the same amount!"); 
 			}
-		
-				
+			else if(evt.getActionCommand().equals("HOME"))
+			{
+				cards.show(trigHolder, "Start");
+			}		
 		}
 	}
     
