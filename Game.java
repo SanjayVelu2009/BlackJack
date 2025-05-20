@@ -12,6 +12,7 @@ public class Game
 	private boolean gameState;
 	private int roundNum;
 	private int potValue;
+	private int amountBet;
 	
 	
 	public Game(String name)
@@ -27,13 +28,13 @@ public class Game
 		roundNum = 0;
 		potValue = 0;
 		gameState = true;
+		amountBet = 0;
 	}
 	
-
+	
 	public int placeBet(int amt)
 	{
-		int amountBet = 0;
-		amountBet = p.placeBet(amt);
+		amountBet += p.placeBet(amt);
 		return amountBet;
 	}
 	
@@ -59,9 +60,9 @@ public class Game
 		return checkForInsurance;
 	}
 	
+	/* @TODO implement playerDoubleDown */
 	public void playerDoubleDown()
 	{
-		/* @TODO make sure to double the bet amount in the TrigJack class */
 	}
 	
 	public boolean playerBustCheck()
@@ -96,52 +97,56 @@ public class Game
 		//if it returns true send this message ("Let's see the dealer's cards!") or if it is fale return ("You lost this round!")		
 	}
 	
-	/* @DONE do something about the dealtCard */
 	public boolean dealerTurn()
 	{
-		if(de.mustHit() == true)
+		boolean hitOnce = false;
+		
+		while (de.mustHit())
 		{
 			//print message the dealer decided to hit!
 			Card dealHit = d.dealCard();
-			de.hit(dealHit);
-			return true;
+			de.dealCard(dealHit);
+			hitOnce = true;
 		}
 		
-		else 
-		{
-			//print message The dealer decided to stand!
-			return false;
-		}
+		return hitOnce;
 		
 	}
 	
+	/* @TODO If Player wins, add amtBet to player balance. Reset AmtBet to zero for next round */
 	public String determine()
 	{
 		String greater = "false";	//for the dealer
+		int dVal = de.getHandValue();
+		int pVal = p.getPlayerHandValue();
 	
-		if(de.getHandValue() <= 21 && p.getPlayerHandValue() <=21)
+		if(dVal <= 21)
 		{
-			if(de.getHandValue() > p.getPlayerHandValue())
+			if(pVal > dVal)
 			{
-				//print message the player lost and that he will be directed to the problem page
-				greater = "true";
+				//player won
+				greater = "false";
+			}
 			
-			}
-			else if(de.getHandValue() < p.getPlayerHandValue())
+			else if(dVal > pVal)
 			{
-				//print message the player won and how much money he won
-				greater = "false";	
+				//player lost
+				greater = "true";
 			}
-			else
+			else if(dVal == pVal)
 			{
 				greater = "push";
 			}
 		}
+		else
+		{
+			greater = "false";
+		}
+		
 		return greater;
 		
 	}
 		
-	/* @TODO Render Player and Dealer Hands */
 	public void render(Graphics g, JPanel panel, boolean hideIn)
 	{
 		boolean hide = hideIn;
@@ -163,5 +168,4 @@ public class Game
 		System.out.println();
 	}
 }
-
 
