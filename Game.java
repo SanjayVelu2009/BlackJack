@@ -15,6 +15,7 @@ public class Game
 	private int amountBet;
 	
 	
+	
 	public Game(String name)
 	{
 		//create deck and shuffle
@@ -63,6 +64,18 @@ public class Game
 	/* @TODO implement playerDoubleDown */
 	public void playerDoubleDown()
 	{
+		amountBet = 2*amountBet;
+		Card doubleCard = d.dealCard();
+		p.dealCard(doubleCard);
+		
+	}
+	
+	public boolean determineGameState()
+	{
+		if(p.playerWinOrLose())
+			return true;
+		else
+			return false;
 	}
 	
 	public boolean playerBustCheck()
@@ -126,6 +139,7 @@ public class Game
 			{
 				//player won
 				greater = "false";
+				p.addBet(amountBet);
 			}
 			
 			else if(dVal > pVal)
@@ -142,6 +156,8 @@ public class Game
 		{
 			greater = "false";
 		}
+		
+		amountBet = 0;
 		
 		return greater;
 		
@@ -168,4 +184,3 @@ public class Game
 		System.out.println();
 	}
 }
-
