@@ -53,7 +53,6 @@ public class Player
 		
 	}
 	
-	/* @TODO Add checks to enforce amt>minimumBet */
 	public int placeBet(int amt)
 	{
 		int amountBet = 0;
@@ -67,7 +66,6 @@ public class Player
 		return amountBet;
 	}
 	
-	/* @TODO need to understand how checkBlackJack is used */
 	public boolean checkBlackJack()
 	{
 		if(getPlayerHandValue() <= 21)
@@ -94,12 +92,19 @@ public class Player
 	public int getPlayerHandValue()
 	{
 		int totalPlayerValue = 0;
+		boolean handHasAce = false;
 		
 		for(int i = 0; i<numCards; i++)
 		{
 			totalPlayerValue += playerHand[i].getValue();
-			System.out.println(totalPlayerValue);
+			//System.out.println(totalPlayerValue);
+			
+			if(playerHand[i].getValue() == 1)
+				handHasAce = true;
 		}
+		
+		if (handHasAce && totalPlayerValue <= 10)
+			totalPlayerValue += 10;
 		
 		return totalPlayerValue;
 	}
