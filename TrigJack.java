@@ -15,6 +15,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
+import java.lang.NumberFormatException;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -498,7 +499,9 @@ class PlayMenu extends JPanel implements ActionListener
 	private JPanel centerPanel;
 	private JPanel buttonPanel;
 	
+	private boolean betButton = false;
 	private boolean hide = true;
+	private boolean problemSwitch = false;
 	
     public PlayMenu(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
@@ -529,53 +532,43 @@ class PlayMenu extends JPanel implements ActionListener
 		Test.addActionListener(this);
 		add(Test, BorderLayout.EAST);
 		
-        gameState = false;
+        gameState = true;
 		
 		saveName(name);
 		game = new Game(name);
 				
-		boolean insurance = game.dealCards(false);
 		
 		//JOptionPane.showMessageDialog(null,"Please place your bet, use the slider to determine how much you would like to bet!");
 		
-		if (insurance)
-		{
-			JOptionPane.showMessageDialog(null,"The Dealer has an Ace! Would you like to pay insurance, if so click on options, then click on insurance!");
-		}
 		
 		
-		
-		game.dealCards(false);
 		
 		add(menuBar,BorderLayout.NORTH);
 		add(betting,BorderLayout.SOUTH);
 		add(cp, BorderLayout.CENTER);
 		add(buttonPanel, BorderLayout.WEST);
 		
-		//saveName(name);
-		//create a really small JTextArea to show amount bet and total amount of money 
-		//betMoney method does that
-		//betMoney();
-		//initAndShuffleDeck();
-		//initHands
-		//insuranceOption
-		//playerTurn
-		//dealerTurn
-		//determine who won
-		//settleAmount
-		//problem if needed
-		//solution if needed
-		//playAgain
-		//when implementing double down don't forget to double the bet amount
+		while(gameState)
+		{
+			gameState = game.determineGameState();
+			boolean insurance = game.dealCards(false);
+			game.dealCards(false);
 		
-		repaint();
+		
+			repaint();
+		
+			if (insurance)
+			{
+				JOptionPane.showMessageDialog(null,"The Dealer has an Ace! Would you like to pay insurance, if so click on options, then click on insurance!");
+			}
+		}
     }
     
     /* @TODO create Labels to reflect Pot Value and Players' current balance 
      * @TODO Position the labels right below the cards and above the slider */
     public void createBettingLabels()
     {
-		JLabel potValue = new JLabel(moneyAmt);
+		JLabel potValue = new JLabel(moneyAmt+"");
 		//write
 		
 	} 
@@ -584,7 +577,7 @@ class PlayMenu extends JPanel implements ActionListener
     public void createButtons()
     {
 		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new GridLayout(3,1));		
+		buttonPanel.setLayout(new GridLayout(4,1));		
 		hit = new JButton("HIT");
 		hit.addActionListener(new ButtonControl());
 		styler.styleButton(hit);
@@ -597,14 +590,22 @@ class PlayMenu extends JPanel implements ActionListener
 		home.addActionListener(new ButtonControl());
 		styler.styleButton(home);
 		buttonPanel.add(home);
+		JButton better = new JButton("BET");
+		better.addActionListener(new ButtonControl());
+		styler.styleButton(better);
+		buttonPanel.add(better);
 	}
     
     public void createMainMenu()
     {
 		JMenuItem insure = new JMenuItem("insurance");
 		JMenuItem doubleDown = new JMenuItem("double down");
-		JMenuItem restart = new JMenuItem("restart");
+		//JMenuItem restart = new JMenuItem("restart");
 		//JMenuItem split = new JMenuItem("split");
+		
+		insure.addActionListener(new MenuControl());
+		doubleDown.addActionListener(new MenuControl());
+		//restart.addActionListener(new MenuControl());
 		
 		menuOpt = new JMenu("Options");
 		menuOpt.setForeground(new Color(255, 215, 0));
@@ -628,7 +629,34 @@ class PlayMenu extends JPanel implements ActionListener
 	    	    
 	    betting.addChangeListener(new SliderControl());
 	}
-    
+	
+	class MenuControl implements ActionListener
+	{
+		public void actionPerformed(ActionEvent evt)
+		{
+			if(evt.getActionCommand().equals("insurance"))
+			{
+				String inputInsure = "";
+				inputInsure = JOptionPane.showInputDialog(null, "Enter your Insurance bet :");
+			
+				try
+				{
+					int insureAmt = Integer.parseInt(inputInsure);
+					JOptionPane.showMessageDialog(null, "You entered: " + inputInsure);
+				}
+				catch(NumberFormatException e)
+				{
+					JOptionPane.showMessageDialog(null, "Invalid Input. Please enter a proper input");
+				}
+			}
+			
+			else if(evt.getActionCommand().equals("double down"));
+			{
+				game.playerDoubleDown();
+				repaint();
+			}
+		}
+	}	
     
     /* @TODO Create and Update a JLabel to reflect Player Balance and Pot Value
      * @TODO Use Slider to set the bet, but only read when user hits a button "Bet" */
@@ -636,10 +664,13 @@ class PlayMenu extends JPanel implements ActionListener
 	{
 		public void stateChanged(ChangeEvent evt)
 		{
-			moneyAmt = betting.getValue();
-			moneyAmt = game.placeBet(moneyAmt);
+			if(betButton)
+			{
+				moneyAmt = betting.getValue();
+				moneyAmt = game.placeBet(moneyAmt);
+			}
 			
-			//JOptionPane.showMessageDialog(null," Amount Bet $" + moneyAmt);
+				//JOptionPane.showMessageDialog(null," Amount Bet $" + moneyAmt);
 							
 		}
 	}
@@ -665,6 +696,12 @@ class PlayMenu extends JPanel implements ActionListener
 					JOptionPane.showMessageDialog(null, "YOU BUSTED");
 				}
 			}
+			
+			else if(evt.getActionCommand().equals("BET"))
+			{
+				betButton = true;
+			}
+			
 			else if(evt.getActionCommand().equals("STAND"))
 			{
 				hide = false;
@@ -681,7 +718,10 @@ class PlayMenu extends JPanel implements ActionListener
 				repaint();
 				
 				if(game.determine().equals("true"))
+				{
 					JOptionPane.showMessageDialog(null,"You Lost this round, time to solve a problem!");
+					problemSwitch = true;
+				}
 				else if(game.determine().equals("false"))
 					JOptionPane.showMessageDialog(null,"You won this round!");
 				else
@@ -702,7 +742,7 @@ class PlayMenu extends JPanel implements ActionListener
 	
 	public void actionPerformed(ActionEvent evt)
     {
-        if (evt.getActionCommand().equals("Test"))
+        if (evt.getActionCommand().equals("Test") || problemSwitch == true)
         {
             cards.show(trigHolder, "Problem");
         }
