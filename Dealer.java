@@ -27,7 +27,7 @@ public class Dealer
 		return card;
 	}
 	
-	/* @TODO checkDealerBlackJack not used anywhere. Remove? */
+	/* @TODO checkDealerBlackJack not used anywhere. Remove? 
 	public boolean checkDealerBlackJack()
 	{
 		if((getHandValue()) <= 21)
@@ -39,7 +39,7 @@ public class Dealer
 		{
 			return false;
 		}
-	}
+	}*/
 	
 	/* Returns True if the Hand is empty and false otherwise */
 	public boolean isHandEmpty()
