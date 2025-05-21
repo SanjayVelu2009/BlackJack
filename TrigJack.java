@@ -480,6 +480,9 @@ class PlayMenu extends JPanel implements ActionListener
 	private JButton Test;
 	private JButton home;
 	
+	private JLabel potValue;
+	private JLabel playerBalance;
+	
     private TrigJackHolder trigHolder;
     private CardLayout cards;
     
@@ -492,7 +495,7 @@ class PlayMenu extends JPanel implements ActionListener
     
     private String name = "";
     private Player player;
-    private int moneyAmt;
+    private int betAmount;
     private int insureAmt;
     private boolean gameState;
 
@@ -522,11 +525,16 @@ class PlayMenu extends JPanel implements ActionListener
         setBackground(new Color(53, 101, 77));
 		
 		CardsPanel cp = new CardsPanel();
+		
 			
 		createBetSlider();
 		createBettingLabels();
 	    createMainMenu();   
 		createButtons();
+		createBettingLabels();
+		
+		cp.add(potValue);
+		cp.add(playerBalance);
 		
 		Test = new JButton("Test");
 		Test.addActionListener(this);
@@ -539,9 +547,6 @@ class PlayMenu extends JPanel implements ActionListener
 				
 		
 		//JOptionPane.showMessageDialog(null,"Please place your bet, use the slider to determine how much you would like to bet!");
-		
-		
-		
 		
 		add(menuBar,BorderLayout.NORTH);
 		add(betting,BorderLayout.SOUTH);
@@ -557,10 +562,10 @@ class PlayMenu extends JPanel implements ActionListener
 		
 			repaint();
 		
-			if (insurance)
+			/*if (insurance)
 			{
 				JOptionPane.showMessageDialog(null,"The Dealer has an Ace! Would you like to pay insurance, if so click on options, then click on insurance!");
-			}
+			}*/
 		}
     }
     
@@ -568,28 +573,44 @@ class PlayMenu extends JPanel implements ActionListener
      * @TODO Position the labels right below the cards and above the slider */
     public void createBettingLabels()
     {
-		JLabel potValue = new JLabel(moneyAmt+"");
-		//write
+		potValue = new JLabel("Pot Value: 0");
+		potValue.setFont(new Font("Serif", Font.BOLD, 20));
+		//potValue.setBackground(new Color(255, 215, 0));
+		potValue.setForeground(new Color(255, 215, 0));
+		potValue.setHorizontalAlignment(SwingConstants.LEFT);
+		potValue.setPreferredSize(new Dimension(0,25));
+		potValue.setBounds(50, 600, 250, 30);
 		
+		playerBalance = new JLabel("Account Balance: 0");
+		playerBalance.setFont(new Font("Serif", Font.BOLD, 20));
+		playerBalance.setHorizontalAlignment(SwingConstants.LEFT);
+		//playerBalance.setBackground(new Color(255, 215, 0));
+		playerBalance.setForeground(new Color(255, 215, 0));
+		playerBalance.setPreferredSize(new Dimension(0,25));
+		playerBalance.setBounds(400, 600, 250, 30);		
 	} 
     
     /* @TODO Add another button called "Bet" to read from slider and commit the bet to Pot Value */
     public void createButtons()
     {
 		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new GridLayout(4,1));		
+		buttonPanel.setLayout(new GridLayout(4,1));	
+			
 		hit = new JButton("HIT");
 		hit.addActionListener(new ButtonControl());
 		styler.styleButton(hit);
+		buttonPanel.add(hit);
+		
 		stand = new JButton("STAND");
 		stand.addActionListener(new ButtonControl());
 		styler.styleButton(stand);		
-		buttonPanel.add(hit);
 		buttonPanel.add(stand);
+		
 		home = new JButton("HOME");
 		home.addActionListener(new ButtonControl());
 		styler.styleButton(home);
 		buttonPanel.add(home);
+		
 		JButton better = new JButton("BET");
 		better.addActionListener(new ButtonControl());
 		styler.styleButton(better);
@@ -626,6 +647,7 @@ class PlayMenu extends JPanel implements ActionListener
 	    betting.setFont(new Font("Serif", Font.PLAIN,15));
 	    betting.setForeground(new Color(255, 215, 0));
 	    betting.setOrientation(JSlider.HORIZONTAL);
+	    betting.setSnapToTicks(true);
 	    	    
 	    betting.addChangeListener(new SliderControl());
 	}
@@ -664,13 +686,16 @@ class PlayMenu extends JPanel implements ActionListener
 	{
 		public void stateChanged(ChangeEvent evt)
 		{
+			int initialBet = 0;
+			initialBet = betting.getValue();
 			if(betButton)
 			{
-				moneyAmt = betting.getValue();
-				moneyAmt = game.placeBet(moneyAmt);
+				betAmount = initialBet;
+				System.out.println("Amount Bet: "+betAmount);
+				betAmount = game.placeBet(betAmount);
+				repaint();
 			}
-			
-				//JOptionPane.showMessageDialog(null," Amount Bet $" + moneyAmt);
+				//JOptionPane.showMessageDialog(null," Amount Bet $" + betAmount);
 							
 		}
 	}
@@ -700,6 +725,7 @@ class PlayMenu extends JPanel implements ActionListener
 			else if(evt.getActionCommand().equals("BET"))
 			{
 				betButton = true;
+				System.out.println(betButton);
 			}
 			
 			else if(evt.getActionCommand().equals("STAND"))
@@ -753,7 +779,7 @@ class PlayMenu extends JPanel implements ActionListener
 	{
 		public CardsPanel()
 		{
-			//setLayout(new GridLayout(2,3));
+			setLayout(null);
 			setBackground(new Color(53,101,77));
 			repaint();
 		}
@@ -763,6 +789,9 @@ class PlayMenu extends JPanel implements ActionListener
 			
 			super.paintComponent(g);
 			
+			playerBalance.setText("Account Balance: $"+game.getPlayerAccountBalance());
+			potValue.setText("Pot Value: $"+game.getPotValue());
+
 			game.render(g, this, hide);
 			
 		}
