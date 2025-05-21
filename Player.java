@@ -101,7 +101,7 @@ public class Player
 		for(int i = 0; i<numCards; i++)
 		{
 			playerCard = playerHand[i];
-			playerCard.render(g, panel, (i*200)+50, 400, false);
+			playerCard.render(g, panel, (i*200)+50, 300, false);
 		}
 	}
 	
@@ -123,5 +123,10 @@ public class Player
 			totalPlayerValue += 10;
 		
 		return totalPlayerValue;
+	}
+	
+	public int getPlayerAccountBalance()
+	{
+		return currentBalance;
 	}
 }
