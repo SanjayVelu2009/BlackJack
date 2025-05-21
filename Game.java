@@ -36,6 +36,7 @@ public class Game
 	public int placeBet(int amt)
 	{
 		amountBet += p.placeBet(amt);
+		potValue = amountBet * 2;
 		return amountBet;
 	}
 	
@@ -92,6 +93,16 @@ public class Game
 			return false;
 		}
 		
+	}
+	
+	public int getPlayerAccountBalance()
+	{
+		return p.getPlayerAccountBalance();
+	}
+	
+	public int getPotValue()
+	{
+		return potValue;
 	}
 	
 	public boolean dealerReveal()
