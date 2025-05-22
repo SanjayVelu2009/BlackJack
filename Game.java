@@ -13,8 +13,7 @@ public class Game
 	private int roundNum;
 	private int potValue;
 	private int amountBet;
-	
-	
+	private int amountInsured;
 	
 	public Game(String name)
 	{
@@ -30,13 +29,18 @@ public class Game
 		potValue = 0;
 		gameState = true;
 		amountBet = 0;
+		amountInsured = 0;
 	}
 	
-	
+	/* Allow betting only once */
 	public int placeBet(int amt)
 	{
-		amountBet += p.placeBet(amt);
-		potValue = amountBet * 2;
+		if (amt >= 5000)
+		{
+			amountBet = p.placeBet(amt);
+			if (amountBet > 0)
+				potValue = amountBet * 2;
+		}
 		return amountBet;
 	}
 	
@@ -60,6 +64,18 @@ public class Game
 		p.dealCard(playerCard);
 
 		return checkForInsurance;
+	}
+	
+	public boolean insure(int insuranceAmount)
+	{
+		
+		if((insuranceAmount > 0) && (amountBet > 0) && (amountBet/2 >= insuranceAmount))
+		{
+			amountInsured = insuranceAmount;
+			return true;
+		}
+	
+		return false;
 	}
 	
 	/* @TODO implement playerDoubleDown */
@@ -121,6 +137,7 @@ public class Game
 		//if it returns true send this message ("Let's see the dealer's cards!") or if it is fale return ("You lost this round!")		
 	}
 	
+	
 	public boolean dealerTurn()
 	{
 		boolean hitOnce = false;
@@ -138,9 +155,9 @@ public class Game
 	}
 	
 	/* @TODO If Player wins, add amtBet to player balance. Reset AmtBet to zero for next round */
-	public String determine()
+	public String settle()
 	{
-		String greater = "false";	//for the dealer
+		String result = "false";	//for the dealer
 		int dVal = de.getHandValue();
 		int pVal = p.getPlayerHandValue();
 	
@@ -149,28 +166,30 @@ public class Game
 			if(pVal > dVal)
 			{
 				//player won
-				greater = "false";
-				p.addBet(amountBet);
+				result = "player won";
+				p.returnWinnings(potValue);
 			}
 			
-			else if(dVal > pVal)
+			else if(pVal < dVal)
 			{
 				//player lost
-				greater = "true";
+				result = "dealer won";
 			}
-			else if(dVal == pVal)
+			else
 			{
-				greater = "push";
+				result = "push";
+				p.returnWinnings(amountBet);
 			}
 		}
 		else
 		{
-			greater = "false";
+			result = "player won";
 		}
 		
-		amountBet = 0;
+		/* TODO Resetting potValue here messes up the message that says player has Won. */
+		potValue = 0;
 		
-		return greater;
+		return result;
 		
 	}
 		
@@ -183,6 +202,16 @@ public class Game
 		
 	}
 	
+	/* Reset Game back to initial state */
+	public void reset()
+	{
+		amountBet = 0;
+		potValue = 0;
+		d.initializeDeck();
+		d.shuffleDeck();	
+		p.resetHand();
+		de.resetHand();
+	}
 	
 	public void showCards()
 	{
