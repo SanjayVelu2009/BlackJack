@@ -22,13 +22,13 @@ public class Card
 		value = inVal;
 		type = inType;
 		cardImage = readImg(getCardImgFileName());
-		cardBackImage = readImg("card_back.jpg");
+		cardBackImage = readImg("images/card_back.jpg");
 		
 	}
 	
 	private String getCardImgFileName()
 	{
-		String imgFileName = value+""+type+".jpg";
+		String imgFileName = "images/"+value+""+type+".jpg";
 		return imgFileName;
 	}
 	
