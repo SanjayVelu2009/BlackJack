@@ -16,6 +16,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
 import java.lang.NumberFormatException;
+import java.util.Scanner;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -108,7 +109,7 @@ class TrigJackHolder extends JPanel
         Instructions ins = new Instructions(this, card);
         Highscores hs = new Highscores(this, card);
         PlayMenu pm = new PlayMenu(this, card);
-        //Problem prob = new Problem(this, card);
+        Problem prob = new Problem(this, card);
         Solution sol = new Solution(this, card);
         Names nam = new Names(this, card);
 
@@ -116,7 +117,7 @@ class TrigJackHolder extends JPanel
         add(ins, "Instructions");
         add(hs, "Highscores");
         add(pm, "Playing");
-        //add(prob, "Problem");
+        add(prob, "Problem");
         add(sol, "Solution");
         add(nam, "Name");
 
@@ -145,7 +146,7 @@ class StartMenu extends JPanel implements ActionListener
 
         try
         {
-			backgroundImage = ImageIO.read(new File("images/background.jpeg"));
+			backgroundImage = ImageIO.read(new File("background.jpeg"));
         }
         catch (IOException e)
         {
@@ -464,7 +465,7 @@ class Names extends JPanel implements ActionListener
     }
 }
 
-class PlayMenu extends JPanel implements ActionListener
+class PlayMenu extends JPanel
 {
 	private JSlider betting;
 	private JMenu menuOpt;
@@ -473,7 +474,6 @@ class PlayMenu extends JPanel implements ActionListener
 	private JButton insure;
 	private JButton hit;
 	private JButton stand;
-	private JButton Test;
 	private JMenuItem home;
 	private JMenuItem newGame;
 	
@@ -538,10 +538,6 @@ class PlayMenu extends JPanel implements ActionListener
 		cp.add(playerBalance);
 		cp.add(insuranceLabel);
 		cp.add(instructions);
-		
-		Test = new JButton("Test");
-		Test.addActionListener(this);
-		add(Test, BorderLayout.EAST);
 		
         gameActive = true;
 		
@@ -632,19 +628,15 @@ class PlayMenu extends JPanel implements ActionListener
     {
 		JMenuItem home = new JMenuItem("Home");
 		JMenuItem newGame = new JMenuItem("New Game");
-		//JMenuItem restart = new JMenuItem("restart");
-		//JMenuItem split = new JMenuItem("split");
 		
 		home.addActionListener(new MenuControl());
 		newGame.addActionListener(new MenuControl());
-		//restart.addActionListener(new MenuControl());
-		
+			
 		menuOpt = new JMenu("Options");
 		menuOpt.setForeground(new Color(255, 215, 0));
 		
 		menuOpt.add(home);
 		menuOpt.add(newGame);
-		//menuOpt.add(split);
 		
 		menuBar = new JMenuBar();
 		menuBar.add(menuOpt);
@@ -740,11 +732,10 @@ class PlayMenu extends JPanel implements ActionListener
 					{
 						instructions.setText("Use the slider to choose insurance amount ($0 to half of BetAmt) \n Press Insure button to place your insurance bet");
 						repaint();
-					}
+					} 
 					else
 					{
-						game.dealCards(false);
-						//Bet successfully placed! Update instructions 
+						game.dealCards(false); // This deals a second set of cards
 						instructions.setText("Player to decide Hit or Stand!");
 						repaint();
 					}
@@ -784,6 +775,7 @@ class PlayMenu extends JPanel implements ActionListener
 				{
 					JOptionPane.showMessageDialog(null,"You Lost $"+(game.getPotValue()/2)+" this round.\nTime to solve a problem!");
 					problemSwitch = true;
+					cards.show(trigHolder, "Problem");
 				}
 				else if(result.equals("player won"))
 				{
@@ -830,14 +822,6 @@ class PlayMenu extends JPanel implements ActionListener
 		name = naming;
 		System.out.println(name);
 	}
-	
-	public void actionPerformed(ActionEvent evt)
-    {
-        if (evt.getActionCommand().equals("Test") || problemSwitch == true)
-        {
-            cards.show(trigHolder, "Problem");
-        }
-    }
     
 	
 	class CardsPanel extends JPanel
@@ -863,16 +847,220 @@ class PlayMenu extends JPanel implements ActionListener
 	}
 }
 
-class Solution extends JPanel
+class Problem extends JPanel implements ActionListener
 {
-    public Solution(TrigJackHolder trigHolderIn, CardLayout cardsIn)
-    {
-        setLayout(null);
-        setBackground(new Color(53, 101, 77));
+    public JButton option1, option2, option3, option4;
+    public ButtonStyler styler = new ButtonStyler();
+    public JLabel questionLabel;
+    public JButton homeButton;
+    public Scanner input;
+    public int correctOption;
+    public TrigJackHolder trigHolder;
+    public CardLayout cards;
+    public Image backgroundImage;
 
-        JLabel label = new JLabel("Solution Page");
-        label.setBounds(350, 350, 200, 30);
-        label.setForeground(Color.WHITE);
-        add(label);
+    public Problem(TrigJackHolder trigHolderIn, CardLayout cardsIn)
+    {
+        trigHolder = trigHolderIn;
+        cards = cardsIn;
+
+        setLayout(null);
+
+        try
+        {
+            backgroundImage = ImageIO.read(new File("background.jpeg"));
+        }
+        catch (IOException e)
+        {
+            System.err.println("Background image not found: " + e.getMessage());
+            setBackground(new Color(53, 101, 77));
+        }
+
+        questionLabel = new JLabel("");
+        questionLabel.setForeground(Color.WHITE);
+        questionLabel.setFont(new Font("DialogInput", Font.BOLD, 24));
+        questionLabel.setOpaque(true);
+        questionLabel.setBackground(new Color(0, 0, 0, 180));
+        questionLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        questionLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        questionLabel.setBounds(25, 30, 950, 120);
+        add(questionLabel);
+
+        option1 = new JButton();
+        option2 = new JButton();
+        option3 = new JButton();
+        option4 = new JButton();
+
+        Color[] buttonColors = {new Color(219, 68, 55), new Color(66, 133, 244), new Color(244, 180, 0), new Color(15, 157, 88)};
+
+        int buttonWidth = 300;
+        int buttonHeight = 80;
+        int gridWidth = buttonWidth * 2 + 20;
+        int gridHeight = buttonHeight * 2 + 20;
+        int gridX = (1000 - gridWidth) / 2;
+        int gridY = (800 - gridHeight - 120 - 80 - 50) / 2 + 120;
+
+        option1.setBounds(gridX, gridY, buttonWidth, buttonHeight);
+        option2.setBounds(gridX + buttonWidth + 20, gridY, buttonWidth, buttonHeight);
+        option3.setBounds(gridX, gridY + buttonHeight + 20, buttonWidth, buttonHeight);
+        option4.setBounds(gridX + buttonWidth + 20, gridY + buttonHeight + 20, buttonWidth, buttonHeight);
+
+        int i;
+        for (i = 0; i < 4; i++)
+        {
+            JButton btn;
+            if (i == 0) btn = option1;
+            else if (i == 1) btn = option2;
+            else if (i == 2) btn = option3;
+            else btn = option4;
+            btn.setBackground(buttonColors[i]);
+            btn.setForeground(Color.BLACK);
+            btn.setFont(new Font("DialogInput", Font.BOLD, 16));
+            btn.setFocusPainted(false);
+            btn.setOpaque(true);
+            btn.setBorderPainted(true);
+            btn.addActionListener(this);
+            add(btn);
+        }
+
+        homeButton = new JButton("Home");
+        styler.styleButton(homeButton);
+        homeButton.setBounds(425, 700, 150, 50);
+        homeButton.addActionListener(this);
+        add(homeButton);
+
+        try
+        {
+            input = new Scanner(new File("TrigQuestions.txt"));
+        }
+        catch (Exception e)
+        {
+            questionLabel.setText("Could not load questions.");
+            option1.setEnabled(false);
+            option2.setEnabled(false);
+            option3.setEnabled(false);
+            option4.setEnabled(false);
+            return;
+        }
+
+        loadNextQuestion();
+    }
+
+    public void loadNextQuestion()
+    {
+        if (input.hasNextLine())
+        {
+            String q = input.nextLine();
+            String a1 = input.nextLine();
+            String a2 = input.nextLine();
+            String a3 = input.nextLine();
+            String a4 = input.nextLine();
+            String correctStr = input.nextLine();
+
+            questionLabel.setText("<html><body style='width: 900px; text-align: center; padding: 10px;'>" + q + "</body></html>");
+            option1.setText("<html>A. " + a1 + "</html>");
+            option2.setText("<html>B. " + a2 + "</html>");
+            option3.setText("<html>C. " + a3 + "</html>");
+            option4.setText("<html>D. " + a4 + "</html>");
+
+            option1.setBackground(new Color(219, 68, 55));
+            option2.setBackground(new Color(66, 133, 244));
+            option3.setBackground(new Color(244, 180, 0));
+            option4.setBackground(new Color(15, 157, 88));
+            option1.setForeground(Color.BLACK);
+            option2.setForeground(Color.BLACK);
+            option3.setForeground(Color.BLACK);
+            option4.setForeground(Color.BLACK);
+
+            option1.setEnabled(true);
+            option2.setEnabled(true);
+            option3.setEnabled(true);
+            option4.setEnabled(true);
+
+            correctOption = Integer.parseInt(correctStr.trim());
+        }
+        else
+        {
+            questionLabel.setText("No more questions!");
+            option1.setEnabled(false);
+            option2.setEnabled(false);
+            option3.setEnabled(false);
+            option4.setEnabled(false);
+        }
+    }
+
+    public void actionPerformed(ActionEvent e)
+    {
+        if (e.getSource() == homeButton)
+        {
+            cards.show(trigHolder, "Start");
+            return;
+        }
+
+        int selected = 0;
+        JButton selectedButton = null;
+
+        if (e.getSource() == option1)
+        {
+            selected = 1;
+            selectedButton = option1;
+        }
+        else if (e.getSource() == option2)
+        {
+            selected = 2;
+            selectedButton = option2;
+        }
+        else if (e.getSource() == option3)
+        {
+            selected = 3;
+            selectedButton = option3;
+        }
+        else if (e.getSource() == option4)
+        {
+            selected = 4;
+            selectedButton = option4;
+        }
+
+        if (selected > 0)
+        {
+            option1.setEnabled(false);
+            option2.setEnabled(false);
+            option3.setEnabled(false);
+            option4.setEnabled(false);
+
+            if (selected == correctOption)
+            {
+                selectedButton.setBackground(new Color(0, 255, 0));
+                JOptionPane.showMessageDialog(this, "Correct! Returning to game.");
+                cards.show(trigHolder, "Playing");
+            }
+            else
+            {
+                selectedButton.setBackground(new Color(255, 0, 0));
+                JOptionPane.showMessageDialog(this, "Incorrect. Correct answer was option " + correctOption + ". Try another question.");
+                if (correctOption == 1) option1.setBackground(new Color(0, 255, 0));
+                else if (correctOption == 2) option2.setBackground(new Color(0, 255, 0));
+                else if (correctOption == 3) option3.setBackground(new Color(0, 255, 0));
+                else if (correctOption == 4) option4.setBackground(new Color(0, 255, 0));
+
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask()
+                {
+                    public void run()
+                    {
+                        loadNextQuestion();
+                    }
+                }, 1000);
+            }
+        }
+    }
+
+    public void paintComponent(Graphics g)
+    {
+        super.paintComponent(g);
+        if (backgroundImage != null)
+        {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
     }
 }
