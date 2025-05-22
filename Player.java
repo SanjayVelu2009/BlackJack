@@ -27,6 +27,12 @@ public class Player
 		numCards++;
 	}
 	
+	/* Discard all cards from hand */
+	public void resetHand()
+	{
+		numCards = 0;
+	}
+	
 	public String showHand(int i)
 	{
 		String card = "";
@@ -39,25 +45,12 @@ public class Player
 		System.out.println("\nYour turn is over!\n");
 	}
 	
-	public void split()
-	{
-		
-		if((playerHand[0].getType() == playerHand[1].getType()) && 
-		   (playerHand[0].getValue() == playerHand[1].getValue()))
-		{
-			Card[] splitHand = new Card[2];
-			splitHand[0] = playerHand[1];
-		}
-		else
-			System.out.println("Cards are not the same!");
-		
-	}
 	
 	public int placeBet(int amt)
 	{
 		int amountBet = 0;
 		
-		if (currentBalance >= amt && amt>= 5000)
+		if (currentBalance >= amt)
 		{
 			amountBet = amt;
 			currentBalance -= amountBet;	
@@ -66,9 +59,8 @@ public class Player
 		return amountBet;
 	}
 	
-	public void addBet(int amt)
+	public void returnWinnings(int amt)
 	{
-		amt = 2*(amt);
 		currentBalance += amt;
 	}
 	
@@ -119,7 +111,7 @@ public class Player
 				handHasAce = true;
 		}
 		
-		if (handHasAce && totalPlayerValue <= 10)
+		if (handHasAce && totalPlayerValue <= 11)
 			totalPlayerValue += 10;
 		
 		return totalPlayerValue;
