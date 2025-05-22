@@ -20,6 +20,12 @@ public class Dealer
 		numCards++;
 	}
 	
+	/* Discard all cards from hand */
+	public void resetHand()
+	{
+		numCards = 0;
+	}
+	
 	public String showHand(int i)
 	{
 		String card = dealerHand[i].show();
@@ -27,19 +33,6 @@ public class Dealer
 		return card;
 	}
 	
-	/* @TODO checkDealerBlackJack not used anywhere. Remove? 
-	public boolean checkDealerBlackJack()
-	{
-		if((getHandValue()) <= 21)
-		{
-			return true;
-		}
-		
-		else
-		{
-			return false;
-		}
-	}*/
 	
 	/* Returns True if the Hand is empty and false otherwise */
 	public boolean isHandEmpty()
@@ -52,10 +45,12 @@ public class Dealer
 	{
 		if((getHandValue()) <= 16)
 		{
+			System.out.println("Dealer must hit "+getHandValue());
 			return true;
 		}
 		else
 		{
+			System.out.println("Dealer need not hit "+getHandValue());
 			return false;
 		}
 	}
@@ -74,8 +69,9 @@ public class Dealer
 				handHasAce = true;
 			System.out.println(totalValue+ "Value at each iteration");
 		}
-			
-		if (handHasAce && totalValue <= 10)
+		
+		/* BUG: Fixed for the check to be <=11 instead of <=10 */
+		if (handHasAce && totalValue <= 11)
 			totalValue += 10;
 		
 		System.out.println(totalValue+ "End Value of each hand");
