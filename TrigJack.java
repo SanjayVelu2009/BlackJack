@@ -145,9 +145,7 @@ class StartMenu extends JPanel implements ActionListener
 
         try
         {
-			//for loop
-			backgroundImage = ImageIO.read(new File("background.jpeg"));
-            //array.append(backgroundImage)
+			backgroundImage = ImageIO.read(new File("images/background.jpeg"));
         }
         catch (IOException e)
         {
@@ -241,7 +239,7 @@ class Instructions extends JPanel implements ActionListener
         }
         catch (IOException e)
         {
-            System.err.println("Background image not found: " + e.getMessage());
+            System.err.println("Instructions image not found: " + e.getMessage());
             setBackground(new Color(53, 0, 77));
         }
 
@@ -369,7 +367,7 @@ class Names extends JPanel implements ActionListener
         }
         catch (IOException e)
         {
-            System.err.println("Background image not found: " + e.getMessage());
+            System.err.println("Instructions image not found: " + e.getMessage());
             setBackground(new Color(53, 0, 77));
         }
 
@@ -471,17 +469,18 @@ class PlayMenu extends JPanel implements ActionListener
 	private JSlider betting;
 	private JMenu menuOpt;
 	private JMenuBar menuBar;
-	private JMenuItem split;
-	private JMenuItem doubleDown;
-	private JMenuItem insure;
-	private JButton allIn;
+	private JButton doubleDown;
+	private JButton insure;
 	private JButton hit;
 	private JButton stand;
 	private JButton Test;
-	private JButton home;
+	private JMenuItem home;
+	private JMenuItem newGame;
 	
 	private JLabel potValue;
 	private JLabel playerBalance;
+	private JLabel instructions;
+	private JLabel insuranceLabel;
 	
     private TrigJackHolder trigHolder;
     private CardLayout cards;
@@ -497,7 +496,7 @@ class PlayMenu extends JPanel implements ActionListener
     private Player player;
     private int betAmount;
     private int insureAmt;
-    private boolean gameState;
+    private boolean gameActive;
 
 	private JPanel centerPanel;
 	private JPanel buttonPanel;
@@ -505,6 +504,8 @@ class PlayMenu extends JPanel implements ActionListener
 	private boolean betButton = false;
 	private boolean hide = true;
 	private boolean problemSwitch = false;
+	private int lastSliderPosition = 0;
+	private boolean successfulBetThisRound = false;
 	
     public PlayMenu(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
@@ -517,7 +518,7 @@ class PlayMenu extends JPanel implements ActionListener
         }
         catch (IOException e)
         {
-            System.err.println("Background image not found: " + e.getMessage());
+            System.err.println("Instructions image not found: " + e.getMessage());
             setBackground(new Color(53, 0, 77));
         }
         /*Main Panels*/   
@@ -535,38 +536,28 @@ class PlayMenu extends JPanel implements ActionListener
 		
 		cp.add(potValue);
 		cp.add(playerBalance);
+		cp.add(insuranceLabel);
+		cp.add(instructions);
 		
 		Test = new JButton("Test");
 		Test.addActionListener(this);
 		add(Test, BorderLayout.EAST);
 		
-        gameState = true;
+        gameActive = true;
 		
 		saveName(name);
 		game = new Game(name);
-				
-		
-		//JOptionPane.showMessageDialog(null,"Please place your bet, use the slider to determine how much you would like to bet!");
-		
+						
 		add(menuBar,BorderLayout.NORTH);
 		add(betting,BorderLayout.SOUTH);
 		add(cp, BorderLayout.CENTER);
 		add(buttonPanel, BorderLayout.WEST);
 		
-		while(gameState)
-		{
-			gameState = game.determineGameState();
-			boolean insurance = game.dealCards(false);
-			game.dealCards(false);
+		instructions.setText("Place your bets! Minimum Bet: $5000");
+		
+		repaint();
 		
 		
-			repaint();
-		
-			/*if (insurance)
-			{
-				JOptionPane.showMessageDialog(null,"The Dealer has an Ace! Would you like to pay insurance, if so click on options, then click on insurance!");
-			}*/
-		}
     }
     
     /* @TODO create Labels to reflect Pot Value and Players' current balance 
@@ -575,64 +566,84 @@ class PlayMenu extends JPanel implements ActionListener
     {
 		potValue = new JLabel("Pot Value: 0");
 		potValue.setFont(new Font("Serif", Font.BOLD, 20));
-		//potValue.setBackground(new Color(255, 215, 0));
 		potValue.setForeground(new Color(255, 215, 0));
 		potValue.setHorizontalAlignment(SwingConstants.LEFT);
 		potValue.setPreferredSize(new Dimension(0,25));
-		potValue.setBounds(50, 600, 250, 30);
+		potValue.setBounds(50, 600, 200, 30);
 		
-		playerBalance = new JLabel("Account Balance: 0");
+		playerBalance = new JLabel("Balance: 0");
 		playerBalance.setFont(new Font("Serif", Font.BOLD, 20));
 		playerBalance.setHorizontalAlignment(SwingConstants.LEFT);
-		//playerBalance.setBackground(new Color(255, 215, 0));
 		playerBalance.setForeground(new Color(255, 215, 0));
 		playerBalance.setPreferredSize(new Dimension(0,25));
-		playerBalance.setBounds(400, 600, 250, 30);		
+		playerBalance.setBounds(300, 600, 200, 30);	
+		
+		insuranceLabel = new JLabel("Insurance: 0");
+		insuranceLabel.setFont(new Font("Serif", Font.BOLD, 20));
+		insuranceLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		insuranceLabel.setForeground(new Color(255, 215, 0));
+		insuranceLabel.setPreferredSize(new Dimension(0,25));
+		insuranceLabel.setBounds(550, 600, 200, 30);		
+		
+		instructions = new JLabel("");
+		instructions.setFont(new Font("Serif", Font.BOLD, 20));
+		instructions.setHorizontalAlignment(SwingConstants.CENTER);
+		instructions.setForeground(new Color(255, 0, 0));
+		instructions.setPreferredSize(new Dimension(0,25));
+		instructions.setBounds(0, 650, 500, 30);
+		
+				
+
 	} 
     
     /* @TODO Add another button called "Bet" to read from slider and commit the bet to Pot Value */
     public void createButtons()
     {
 		buttonPanel = new JPanel();
-		buttonPanel.setLayout(new GridLayout(4,1));	
+		buttonPanel.setLayout(new GridLayout(5,1));	
 			
-		hit = new JButton("HIT");
+		hit = new JButton("Hit");
 		hit.addActionListener(new ButtonControl());
 		styler.styleButton(hit);
 		buttonPanel.add(hit);
 		
-		stand = new JButton("STAND");
+		stand = new JButton("Stand");
 		stand.addActionListener(new ButtonControl());
 		styler.styleButton(stand);		
 		buttonPanel.add(stand);
 		
-		home = new JButton("HOME");
-		home.addActionListener(new ButtonControl());
-		styler.styleButton(home);
-		buttonPanel.add(home);
+		doubleDown = new JButton("Double Down");
+		doubleDown.addActionListener(new ButtonControl());
+		styler.styleButton(doubleDown);
+		buttonPanel.add(doubleDown);
 		
-		JButton better = new JButton("BET");
+		JButton better = new JButton("Bet");	
 		better.addActionListener(new ButtonControl());
 		styler.styleButton(better);
 		buttonPanel.add(better);
+		
+		JButton insure = new JButton("Insure");	
+		insure.addActionListener(new ButtonControl());
+		styler.styleButton(insure);
+		buttonPanel.add(insure);
 	}
     
     public void createMainMenu()
     {
-		JMenuItem insure = new JMenuItem("insurance");
-		JMenuItem doubleDown = new JMenuItem("double down");
+		JMenuItem home = new JMenuItem("Home");
+		JMenuItem newGame = new JMenuItem("New Game");
 		//JMenuItem restart = new JMenuItem("restart");
 		//JMenuItem split = new JMenuItem("split");
 		
-		insure.addActionListener(new MenuControl());
-		doubleDown.addActionListener(new MenuControl());
+		home.addActionListener(new MenuControl());
+		newGame.addActionListener(new MenuControl());
 		//restart.addActionListener(new MenuControl());
 		
 		menuOpt = new JMenu("Options");
 		menuOpt.setForeground(new Color(255, 215, 0));
 		
-		menuOpt.add(insure);
-		menuOpt.add(doubleDown);
+		menuOpt.add(home);
+		menuOpt.add(newGame);
 		//menuOpt.add(split);
 		
 		menuBar = new JMenuBar();
@@ -641,11 +652,12 @@ class PlayMenu extends JPanel implements ActionListener
 	
     public void createBetSlider()
     {
-		betting = new JSlider(5000, 10000,5000);
-        betting.setMajorTickSpacing(1000);
+		betting = new JSlider(0,10000,0);
+        betting.setMajorTickSpacing(500);
 	    betting.setPaintLabels(true);
 	    betting.setFont(new Font("Serif", Font.PLAIN,15));
 	    betting.setForeground(new Color(255, 215, 0));
+	    betting.setBackground(new Color(255, 0, 0));
 	    betting.setOrientation(JSlider.HORIZONTAL);
 	    betting.setSnapToTicks(true);
 	    	    
@@ -656,47 +668,35 @@ class PlayMenu extends JPanel implements ActionListener
 	{
 		public void actionPerformed(ActionEvent evt)
 		{
-			if(evt.getActionCommand().equals("insurance"))
+			if(evt.getActionCommand().equals("Home"))
 			{
-				String inputInsure = "";
-				inputInsure = JOptionPane.showInputDialog(null, "Enter your Insurance bet :");
-			
-				try
-				{
-					int insureAmt = Integer.parseInt(inputInsure);
-					JOptionPane.showMessageDialog(null, "You entered: " + inputInsure);
-				}
-				catch(NumberFormatException e)
-				{
-					JOptionPane.showMessageDialog(null, "Invalid Input. Please enter a proper input");
-				}
+				cards.show(trigHolder, "Start");
 			}
-			
-			else if(evt.getActionCommand().equals("double down"));
+			else if(evt.getActionCommand().equals("New Game"))	
 			{
-				game.playerDoubleDown();
+				gameActive = true;
+				hide = true;
+				successfulBetThisRound = false;
+				game.reset();
+				boolean insurance = game.dealCards(false);
+				if (insurance)
+				{
+					//JOptionPane.showMessageDialog(null,"The Dealer has an Ace! Would you like to pay insurance, if so click on options, then click on insurance!");
+				}
+				game.dealCards(false);
+				instructions.setText("Place your bets! Minimum Bet: $5000");
 				repaint();
-			}
+				
+			}	
+			
 		}
 	}	
     
-    /* @TODO Create and Update a JLabel to reflect Player Balance and Pot Value
-     * @TODO Use Slider to set the bet, but only read when user hits a button "Bet" */
 	class SliderControl implements ChangeListener
 	{
 		public void stateChanged(ChangeEvent evt)
-		{
-			int initialBet = 0;
-			initialBet = betting.getValue();
-			if(betButton)
-			{
-				betAmount = initialBet;
-				System.out.println("Amount Bet: "+betAmount);
-				betAmount = game.placeBet(betAmount);
-				repaint();
-			}
-				//JOptionPane.showMessageDialog(null," Amount Bet $" + betAmount);
-							
+		{	
+			lastSliderPosition = betting.getValue();				
 		}
 	}
 		
@@ -704,61 +704,126 @@ class PlayMenu extends JPanel implements ActionListener
 	{
 		public void actionPerformed(ActionEvent evt)
 		{
-			if(evt.getActionCommand().equals("HIT"))
+			
+			if (!gameActive)
+			{
+				instructions.setText("Error! No Active Game. Start a new game!");
+			}
+			else if(evt.getActionCommand().equals("Hit"))
 			{
 				game.dealCards(true);
-				
+		
 				repaint();
-				JOptionPane.showMessageDialog(null, "You HIT! Press stand if you want to end your turn!");
 				
 				boolean checkingBlackJack = game.playerBustCheck();
 				
 				if(checkingBlackJack == true)
 				{
 					System.out.println("Player busted");
+					instructions.setText("Player busted Lost $"+(game.getPotValue()/2)+" this round.");
 					hide = false; 
+					gameActive = false;
 					repaint();
-					JOptionPane.showMessageDialog(null, "YOU BUSTED");
 				}
 			}
-			
-			else if(evt.getActionCommand().equals("BET"))
+			else if ((evt.getActionCommand().equals("Bet")) && (!successfulBetThisRound))
 			{
-				betButton = true;
-				System.out.println(betButton);
+				betAmount = lastSliderPosition;
+				System.out.println("Amount Bet: "+betAmount);
+				betAmount = game.placeBet(betAmount);
+				
+				if (betAmount > 0)
+				{
+					successfulBetThisRound = true;
+					boolean insurance = game.dealCards(false);
+					if (insurance)
+					{
+						instructions.setText("Use the slider to choose insurance amount ($0 to half of BetAmt) \n Press Insure button to place your insurance bet");
+						repaint();
+					}
+					else
+					{
+						game.dealCards(false);
+						//Bet successfully placed! Update instructions 
+						instructions.setText("Player to decide Hit or Stand!");
+						repaint();
+					}
+				}
+				else
+				{
+					instructions.setText("Error: Insufficient balance or bet. Minimum bet: $5000");
+				}
+				
+				repaint();
 			}
-			
-			else if(evt.getActionCommand().equals("STAND"))
+			else if(evt.getActionCommand().equals("Stand"))
 			{
 				hide = false;
+				
+				instructions.setText("Player is done playing! Dealer's Turn!");
+
 				
 				//dealer turn determines hit or stand
 				if(game.dealerTurn())
 				{
-					JOptionPane.showMessageDialog(null,"Dealer decided to Hit");
+					//JOptionPane.showMessageDialog(null,"Dealer decided to Hit");
+					System.out.println("Dealer decided to Hit");
 				}
 				else
 				{
-					JOptionPane.showMessageDialog(null,"Dealer turn is over!");
+					//JOptionPane.showMessageDialog(null,"Dealer turn is over!");
+					System.out.println("Dealer turn is over!");
 				}
+				
 				repaint();
 				
-				if(game.determine().equals("true"))
+				/* Settle Game */
+				String result = game.settle();
+				
+				if(result.equals("dealer won"))
 				{
-					JOptionPane.showMessageDialog(null,"You Lost this round, time to solve a problem!");
+					JOptionPane.showMessageDialog(null,"You Lost $"+(game.getPotValue()/2)+" this round.\nTime to solve a problem!");
 					problemSwitch = true;
 				}
-				else if(game.determine().equals("false"))
-					JOptionPane.showMessageDialog(null,"You won this round!");
+				else if(result.equals("player won"))
+				{
+					JOptionPane.showMessageDialog(null,"You won $"+(game.getPotValue()/2)+" this round!");
+				}
 				else
-					JOptionPane.showMessageDialog(null,"It's a push! You and the dealer have the same amount!"); 
+				{
+					JOptionPane.showMessageDialog(null,"It's a push! You lost nothing!"); 
+				}
+				repaint();
+				gameActive = false;
 			}
-			else if(evt.getActionCommand().equals("HOME"))
+			
+			else if(evt.getActionCommand().equals("Insure"))
 			{
-				cards.show(trigHolder, "Start");
-			}		
-		}
-	}
+				insureAmt = lastSliderPosition;
+				
+				if(game.insure(insureAmt))
+				{
+					game.dealCards(false);
+					instructions.setText("Player to decide Hit or Stand!");
+					
+				}
+				else
+				{
+					instructions.setText("Error: Insufficient balance or bet.");
+				}
+				
+				repaint();
+			
+			}
+			
+			else if(evt.getActionCommand().equals("double down"));
+			{
+				game.playerDoubleDown();
+				repaint();
+			}
+				
+		} /* actionPerformed */
+	} /* Class Button Control */
     
     public void saveName(String naming)
     {
@@ -789,7 +854,7 @@ class PlayMenu extends JPanel implements ActionListener
 			
 			super.paintComponent(g);
 			
-			playerBalance.setText("Account Balance: $"+game.getPlayerAccountBalance());
+			playerBalance.setText("Balance: $"+game.getPlayerAccountBalance());
 			potValue.setText("Pot Value: $"+game.getPotValue());
 
 			game.render(g, this, hide);
