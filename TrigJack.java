@@ -146,7 +146,7 @@ class StartMenu extends JPanel implements ActionListener
 
         try
         {
-			backgroundImage = ImageIO.read(new File("background.jpeg"));
+			backgroundImage = ImageIO.read(new File("images/background.jpeg"));
         }
         catch (IOException e)
         {
@@ -670,12 +670,6 @@ class PlayMenu extends JPanel
 				hide = true;
 				successfulBetThisRound = false;
 				game.reset();
-				boolean insurance = game.dealCards(false);
-				if (insurance)
-				{
-					//JOptionPane.showMessageDialog(null,"The Dealer has an Ace! Would you like to pay insurance, if so click on options, then click on insurance!");
-				}
-				game.dealCards(false);
 				instructions.setText("Place your bets! Minimum Bet: $5000");
 				repaint();
 				
@@ -691,9 +685,130 @@ class PlayMenu extends JPanel
 			lastSliderPosition = betting.getValue();				
 		}
 	}
+	
 		
 	class ButtonControl implements ActionListener
 	{
+		
+		public void handleHit()
+		{
+			game.dealCards(true);
+	
+			repaint();
+			
+			boolean checkingBlackJack = game.playerBustCheck();
+			
+			if(checkingBlackJack == true)
+			{
+				instructions.setText("Player busted Lost $"+(game.getPotValue()/2)+" this round.");
+				hide = false; 
+				gameActive = false;
+				repaint();
+				JOptionPane.showMessageDialog(null, "Player busted Lost $"+(game.getPotValue()/2)+" this round.");
+				game.reset();
+				cards.show(trigHolder, "Problem");
+			}
+		} /* handleHit */
+		
+		public void handleBet()
+		{
+			betAmount = lastSliderPosition;
+			System.out.println("Amount Bet: "+betAmount);
+			betAmount = game.placeBet(betAmount);
+			
+			if (betAmount > 0)
+			{
+				successfulBetThisRound = true;
+				System.out.println("Dealing Cards");
+				boolean insurance = game.dealCards(false);
+				
+				if (insurance)
+				{
+					instructions.setText("Use the slider to choose insurance amount ($0 to half of BetAmt) \n Press Insure button to place your insurance bet");
+					repaint();
+				} 
+				else
+				{
+					System.out.println("Dealing 2nd set of cards");
+					game.dealCards(false); 
+					instructions.setText("Player to decide Hit or Stand!");
+					repaint();	
+				}
+			}
+			else
+			{
+				instructions.setText("Error: Insufficient balance or bet. Minimum bet: $5000");
+			}
+			
+			repaint();
+		}
+		
+		public void handleStand()
+		{	
+			hide = false;
+				
+			instructions.setText("Player is done playing! Dealer's Turn!");
+
+			//dealer turn determines hit or stand
+			if(game.dealerTurn())
+			{
+				//JOptionPane.showMessageDialog(null,"Dealer decided to Hit");
+				instructions.setText("Dealer decided to Hit");
+				System.out.println("Dealer decided to Hit");
+			}
+			else
+			{
+				//JOptionPane.showMessageDialog(null,"Dealer turn is over!");
+				instructions.setText("Dealer turn is over");
+				System.out.println("Dealer turn is over!");
+			}
+			
+			repaint();
+			
+			/* Settle Game */
+			String result = game.settle();
+			
+			if(result.equals("dealer won"))
+			{
+				System.out.println("dealer won");
+				JOptionPane.showMessageDialog(null,"You Lost $"+(game.getPotValue()/2)+" this round.\nTime to solve a problem!");
+				problemSwitch = true;
+				game.reset();
+				cards.show(trigHolder, "Problem");
+			}
+			else if(result.equals("player won"))
+			{
+				System.out.println("player won");
+				JOptionPane.showMessageDialog(null,"You won $"+(game.getPotValue()/2)+" this round!");
+			}
+			else
+			{
+				System.out.println("Its a push");
+				JOptionPane.showMessageDialog(null,"It's a push! You lost nothing!"); 
+			}
+			game.reset();
+			repaint();
+			gameActive = false;
+		}
+		
+		public void handleInsure()
+		{
+			
+			insureAmt = lastSliderPosition;
+			
+			if(game.insure(insureAmt))
+			{
+				game.dealCards(false);
+				instructions.setText("Player to decide Hit or Stand!");
+			}
+			else
+			{
+				instructions.setText("Error: Insufficient balance or bet.");
+			}
+							
+			repaint();
+		}
+		
 		public void actionPerformed(ActionEvent evt)
 		{
 			
@@ -701,121 +816,30 @@ class PlayMenu extends JPanel
 			{
 				instructions.setText("Error! No Active Game. Start a new game!");
 			}
-			else if(evt.getActionCommand().equals("Hit"))
+			else if ((evt.getActionCommand().equals("Hit")) && successfulBetThisRound)
 			{
-				game.dealCards(true);
-		
-				repaint();
-				
-				boolean checkingBlackJack = game.playerBustCheck();
-				
-				if(checkingBlackJack == true)
-				{
-					System.out.println("Player busted");
-					instructions.setText("Player busted Lost $"+(game.getPotValue()/2)+" this round.");
-					hide = false; 
-					gameActive = false;
-					repaint();
-				}
+				handleHit();
 			}
 			else if ((evt.getActionCommand().equals("Bet")) && (!successfulBetThisRound))
 			{
-				betAmount = lastSliderPosition;
-				System.out.println("Amount Bet: "+betAmount);
-				betAmount = game.placeBet(betAmount);
-				
-				if (betAmount > 0)
-				{
-					successfulBetThisRound = true;
-					boolean insurance = game.dealCards(false);
-					if (insurance)
-					{
-						instructions.setText("Use the slider to choose insurance amount ($0 to half of BetAmt) \n Press Insure button to place your insurance bet");
-						repaint();
-					} 
-					else
-					{
-						game.dealCards(false); // This deals a second set of cards
-						instructions.setText("Player to decide Hit or Stand!");
-						repaint();
-					}
-				}
-				else
-				{
-					instructions.setText("Error: Insufficient balance or bet. Minimum bet: $5000");
-				}
-				
-				repaint();
+				handleBet();
 			}
-			else if(evt.getActionCommand().equals("Stand"))
+			else if ((evt.getActionCommand().equals("Stand")) && successfulBetThisRound)
 			{
-				hide = false;
-				
-				instructions.setText("Player is done playing! Dealer's Turn!");
-
-				
-				//dealer turn determines hit or stand
-				if(game.dealerTurn())
-				{
-					//JOptionPane.showMessageDialog(null,"Dealer decided to Hit");
-					System.out.println("Dealer decided to Hit");
-				}
-				else
-				{
-					//JOptionPane.showMessageDialog(null,"Dealer turn is over!");
-					System.out.println("Dealer turn is over!");
-				}
-				
-				repaint();
-				
-				/* Settle Game */
-				String result = game.settle();
-				
-				if(result.equals("dealer won"))
-				{
-					JOptionPane.showMessageDialog(null,"You Lost $"+(game.getPotValue()/2)+" this round.\nTime to solve a problem!");
-					problemSwitch = true;
-					cards.show(trigHolder, "Problem");
-				}
-				else if(result.equals("player won"))
-				{
-					JOptionPane.showMessageDialog(null,"You won $"+(game.getPotValue()/2)+" this round!");
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(null,"It's a push! You lost nothing!"); 
-				}
-				repaint();
-				gameActive = false;
+				handleStand();
 			}
-			
-			else if(evt.getActionCommand().equals("Insure"))
+			else if ((evt.getActionCommand().equals("Insure")) && successfulBetThisRound)
 			{
-				insureAmt = lastSliderPosition;
-				
-				if(game.insure(insureAmt))
-				{
-					game.dealCards(false);
-					instructions.setText("Player to decide Hit or Stand!");
-					
-				}
-				else
-				{
-					instructions.setText("Error: Insufficient balance or bet.");
-				}
-				
-				repaint();
-			
+				handleInsure();
 			}
-			
-			else if(evt.getActionCommand().equals("double down"));
+			else if ((evt.getActionCommand().equals("Double Down")) && successfulBetThisRound)
 			{
 				game.playerDoubleDown();
 				repaint();
 			}
-				
 		} /* actionPerformed */
 	} /* Class Button Control */
+    
     
     public void saveName(String naming)
     {
@@ -868,7 +892,7 @@ class Problem extends JPanel implements ActionListener
 
         try
         {
-            backgroundImage = ImageIO.read(new File("background.jpeg"));
+            backgroundImage = ImageIO.read(new File("images/background.jpeg"));
         }
         catch (IOException e)
         {
@@ -989,36 +1013,41 @@ class Problem extends JPanel implements ActionListener
         }
     }
 
-    public void actionPerformed(ActionEvent e)
+    public void actionPerformed(ActionEvent evt)
     {
-        if (e.getSource() == homeButton)
+        if (evt.getSource() == homeButton)
         {
             cards.show(trigHolder, "Start");
-            return;
         }
 
         int selected = 0;
         JButton selectedButton = null;
 
-        if (e.getSource() == option1)
+        if (evt.getSource() == option1)
         {
             selected = 1;
             selectedButton = option1;
+            cards.show(trigHolder, "Playing");
         }
-        else if (e.getSource() == option2)
+        else if (evt.getSource() == option2)
         {
             selected = 2;
             selectedButton = option2;
+            cards.show(trigHolder, "Playing");
+
         }
-        else if (e.getSource() == option3)
+        else if (evt.getSource() == option3)
         {
             selected = 3;
             selectedButton = option3;
+            cards.show(trigHolder, "Playing");
+
         }
-        else if (e.getSource() == option4)
+        else if (evt.getSource() == option4)
         {
             selected = 4;
             selectedButton = option4;
+            cards.show(trigHolder, "Playing");
         }
 
         if (selected > 0)
