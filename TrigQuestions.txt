@@ -1,0 +1,198 @@
+What is the value of sin(0°)?
+0
+1
+√2/2
+Undefined
+1
+What is cos(90°)?
+0
+1
+-1
+Undefined
+2
+What is tan(45°)?
+1
+√3
+0
+Undefined
+3
+Which of the following is cot(60°)?
+0
+√3
+1/√3
+1
+4
+What is sec(0°)?
+1
+0
+Undefined
+√3/2
+1
+Which function is the reciprocal of sine?
+Cosine
+Tangent
+Cosecant
+Secant
+3
+What is the hypotenuse of a right triangle with legs of length 3 and 4?
+5
+6
+7
+√13
+1
+If sin(θ) = 3/5 and θ is in Quadrant II, what is cos(θ)?
+4/5
+-4/5
+3/4
+-3/4
+2
+Which of the following is not a Pythagorean identity?
+sin²x + cos²x = 1
+tan²x + 1 = sec²x
+1 + cot²x = csc²x
+sinx + cosx = 1
+4
+What is the range of the sine function?
+(−∞, ∞)
+[−1, 1]
+[0, ∞)
+[−π, π]
+2
+What is the period of cos(x)?
+π
+2π
+180°
+90°
+2
+Convert 120° to radians.
+π/2
+2π/3
+3π/4
+5π/6
+2
+What is the reference angle for 210°?
+30°
+60°
+45°
+90°
+1
+If cos(θ) = −√2/2, what could be θ in degrees?
+45°
+135°
+315°
+30°
+2
+Which identity represents tan(x) in terms of sine and cosine?
+sin(x)/cos(x)
+cos(x)/sin(x)
+sin²(x) + cos²(x)
+1/sin(x)
+1
+What is sin(π/2)?
+1
+0
+−1
+Undefined
+1
+Which quadrant is angle 300° in?
+I
+II
+III
+IV
+4
+If sin²x = 1/4, what is a possible value of sin(x)?
+1/2
+−1/2
+±1/2
+±√3/2
+3
+Which of the following is true about cos(−x)?
+cos(−x) = −cos(x)
+cos(−x) = cos(x)
+cos(−x) = sin(x)
+cos(−x) = −sin(x)
+2
+Which is not an odd function?
+sin(x)
+tan(x)
+cos(x)
+csc(x)
+3
+What is the amplitude of y = 3 sin(x)?
+3
+1
+2π
+Undefined
+1
+What is the phase shift of y = sin(x − π/4)?
+π
+−π/4
+π/4
+0
+3
+What is the period of y = tan(x)?
+π
+2π
+180°
+360°
+1
+Which trig function has vertical asymptotes at x = ±π/2, ±3π/2…?
+tan(x)
+cot(x)
+sec(x)
+csc(x)
+1
+If a triangle has angles 30°, 60°, and 90°, what are the side ratios?
+1 : 1 : √2
+1 : √3 : 2
+√3 : 1 : 2
+1 : 2 : √3
+2
+What is the value of sin(30°)?
+1/2
+√2/2
+√3/2
+0
+1
+Solve: sin(x) = 0.5, 0° ≤ x ≤ 360°
+30°, 150°
+90°, 270°
+60°, 120°
+45°, 135°
+1
+Which of the following graphs represents a vertical stretch of sine?
+y = sin(x)
+y = 2 sin(x)
+y = sin(2x)
+y = sin(x + π)
+2
+What is the general solution to cos(x) = 0?
+x = π/2 + nπ
+x = πn
+x = 2πn
+x = nπ/2
+1
+Which function has a maximum value of 1 and minimum of −1?
+tan(x)
+cot(x)
+sec(x)
+sin(x)
+4
+If an angle in standard position has its terminal side on the x-axis, what is its sine value?
+1
+0
+Undefined
+−1
+2
+Which function is even?
+sin(x)
+tan(x)
+cos(x)
+csc(x)
+3
+If the height of a building casts a shadow of 40 feet and the angle of elevation is 45°, how tall is the building?
+20√3 ft
+40 ft
+40√2 ft
+80 ft
+2
