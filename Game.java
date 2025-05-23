@@ -58,6 +58,7 @@ public class Game
 				checkForInsurance = true;
 			}
 			de.dealCard(dealerCard);
+			//System.out.println(dealerCard.show() + " Dealer Card");
 		}
 
 		Card playerCard = d.dealCard();
@@ -71,8 +72,7 @@ public class Game
 		
 		if((insuranceAmount > 0) && (amountBet > 0) && (amountBet/2 >= insuranceAmount))
 		{
-			amountInsured = insuranceAmount;
-			return true;
+			return p.insure(insuranceAmount);
 		}
 	
 		return false;
@@ -81,9 +81,11 @@ public class Game
 	/* @TODO implement playerDoubleDown */
 	public void playerDoubleDown()
 	{
-		amountBet = 2*amountBet;
+		
+		System.out.println("Player Double Down");
+		/* amountBet = 2*amountBet;
 		Card doubleCard = d.dealCard();
-		p.dealCard(doubleCard);
+		p.dealCard(doubleCard);*/
 		
 	}
 	
@@ -98,7 +100,6 @@ public class Game
 	public boolean playerBustCheck()
 	{
 		int playerValue = p.getPlayerHandValue();
-		//System.out.println(playerValue);
 		
 		if(playerValue > 21)
 		{
@@ -157,7 +158,7 @@ public class Game
 	/* @TODO If Player wins, add amtBet to player balance. Reset AmtBet to zero for next round */
 	public String settle()
 	{
-		String result = "false";	//for the dealer
+		String result = "";	
 		int dVal = de.getHandValue();
 		int pVal = p.getPlayerHandValue();
 	
@@ -187,7 +188,7 @@ public class Game
 		}
 		
 		/* TODO Resetting potValue here messes up the message that says player has Won. */
-		potValue = 0;
+		//potValue = 0;
 		
 		return result;
 		
