@@ -8,7 +8,7 @@ public class Player
 	
 	private String name;
 	private Card[] playerHand;
-	private int numCards;
+	public int numCards;
 	private int currentBalance;
 	
 	
@@ -24,7 +24,20 @@ public class Player
 	public void dealCard(Card c)
 	{
 		playerHand[numCards] = c;
+		System.out.println(playerHand[numCards].show() + " Player card");
 		numCards++;
+	}
+	
+	public boolean insure(int insuranceAmount)
+	{
+		boolean success = false;
+		
+		if (insuranceAmount <= currentBalance)
+		{
+			currentBalance -= insuranceAmount;
+			success = true;
+		}
+		return success;
 	}
 	
 	/* Discard all cards from hand */
@@ -86,10 +99,11 @@ public class Player
 		else
 			return false;
 	}
-	
+	/*TODO renderHand for iterations should numCards be subtracted by one? */
 	public void renderHand(Graphics g, JPanel panel)
 	{
 		Card playerCard;
+		System.out.println("Num Cards "+numCards);
 		for(int i = 0; i<numCards; i++)
 		{
 			playerCard = playerHand[i];
