@@ -5,7 +5,7 @@ import java.awt.*;
 public class Dealer
 {
 	Card[] dealerHand;
-	int numCards;
+	public int numCards;
 	
 	//dealer must hit if both cards revealed are 16 or less and must stand if the total is 17 or more
 	public Dealer()
@@ -17,6 +17,7 @@ public class Dealer
 	public void dealCard(Card c)
 	{
 		dealerHand[numCards] = c;
+		System.out.println(dealerHand[numCards].show() + " Dealer cards");
 		numCards++;
 	}
 	
