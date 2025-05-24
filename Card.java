@@ -22,7 +22,7 @@ public class Card
 		value = inVal;
 		type = inType;
 		cardImage = readImg(getCardImgFileName());
-		cardBackImage = readImg("assets/card_back.jpg");
+		cardBackImage = readImg("assets/card_back.jpg");			//back image of the card
 		
 	}
 	
@@ -32,7 +32,7 @@ public class Card
 		return imgFileName;
 	}
 	
-	private Image readImg(String cardName)
+	private Image readImg(String cardName)		//reads the image and returns it
 	{
 		Image img = null;
 		try
@@ -48,11 +48,11 @@ public class Card
 		return img;
 	}
 	
-	public int getValue()
+	public int getValue()		//gets the value of the card
 	{
 		int retVal = value;
 		
-		if(value == 11 || value == 12 || value == 13)
+		if(value == 11 || value == 12 || value == 13)		//if it is a face card value is 10
 		{
 			retVal = 10;
 		}
@@ -60,19 +60,19 @@ public class Card
 		return retVal;
 	}
 	
-	public char getType()
+	public char getType()		//returns type
 	{
 		return type;
 	}
 	
-	public Image getImage()
+	public Image getImage()		
 	{
 		return cardImage;
 	}
 	
-	public void render(Graphics g, JPanel panel, int xpos, int ypos, boolean hide)
+	public void render(Graphics g, JPanel panel, int xpos, int ypos, boolean hide)	//renders image using drawImage, Graphics g being passed in
 	{
-		if (!hide)
+		if (!hide)	
 		{
 			g.drawImage(cardImage,xpos,ypos,cardImage.getWidth(panel)/4,cardImage.getHeight(panel)/4, panel);
 		}
@@ -82,7 +82,7 @@ public class Card
 		}
 	}
 	
-	public String show()
+	public String show()	//returns a string with value and suite
 	{
 		String card = "";
 		String suite = "";
