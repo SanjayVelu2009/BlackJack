@@ -70,7 +70,7 @@ public class Deck
 	
 	public  void showDeck()
 	{
-		for(int i = 0; i<=51; i++)
+		for(int i = 0; i<=51; i++)	
 		{
 			cardStack[i].show();
 		}
@@ -79,7 +79,7 @@ public class Deck
 	public void shuffleDeck()
 	{
 		int b;		
-		
+		//shuffles the deck by using a random integer and shuffling 
 		for(int a = 0; a<cardStack.length; a++)
 		{
 			b = (int)(Math.random()*(cardStack.length-1));
@@ -91,7 +91,7 @@ public class Deck
 				cardStack[a] = cardStack[b];
 				cardStack[b] = swapCard;
 			}
-			else
+			else  				//if b and a are the same a gets subtracted so it can be reiterated and therefore shuffling the entire deck
 				a--;
 		}	
 		
@@ -99,7 +99,7 @@ public class Deck
 	}
 			
 
-	public Card dealCard()
+	public Card dealCard()		//pops the top card of the stack(deck of cards)
 	{
 		Card deal = cardStack[topCard];
 		topCard++;
