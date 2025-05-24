@@ -14,6 +14,7 @@ public class Game
 	private int potValue;
 	private int amountBet;
 	private int amountInsured;
+	private int lastAmountBet;
 	
 	public Game(String name)
 	{
@@ -32,12 +33,17 @@ public class Game
 		amountInsured = 0;
 	}
 	
+	public void rewardPlayer()
+	{
+		p.returnWinnings(lastAmountBet/2);
+	}
+	
 	/* Allow betting only once */
 	public int placeBet(int amt)
 	{
 		if (amt >= 5000)
 		{
-			amountBet = p.placeBet(amt);
+			amountBet += p.placeBet(amt);
 			if (amountBet > 0)
 				potValue = amountBet * 2;
 		}
@@ -53,7 +59,7 @@ public class Game
 		if (!playerOnly)
 		{
 			Card dealerCard = d.dealCard();
-			if( de.isHandEmpty() && dealerCard.show().contains("1"))
+			if( de.isHandEmpty() && (dealerCard.getValue() == 1) && (p.getPlayerAccountBalance() > 0))
 			{
 				checkForInsurance = true;
 			}
@@ -72,20 +78,30 @@ public class Game
 		
 		if((insuranceAmount > 0) && (amountBet > 0) && (amountBet/2 >= insuranceAmount))
 		{
-			return p.insure(insuranceAmount);
+			if (p.insure(insuranceAmount))
+			{
+				amountInsured = insuranceAmount;
+				return true;
+			}
 		}
 	
 		return false;
 	}
 	
 	/* @TODO implement playerDoubleDown */
-	public void playerDoubleDown()
+	public boolean playerDoubleDown()
 	{
+		boolean doubleDownSuccess = false;
 		
-		System.out.println("Player Double Down");
-		/* amountBet = 2*amountBet;
-		Card doubleCard = d.dealCard();
-		p.dealCard(doubleCard);*/
+		
+		if (placeBet(amountBet) > 0)
+		{
+			Card doubleCard = d.dealCard();
+			p.dealCard(doubleCard);
+			doubleDownSuccess = true;
+		}
+		
+		return doubleDownSuccess;
 		
 	}
 	
@@ -162,6 +178,8 @@ public class Game
 		int dVal = de.getHandValue();
 		int pVal = p.getPlayerHandValue();
 	
+		System.out.println("D Value: "+dVal+" P Value: "+pVal+" Pot Value: "+potValue);
+		
 		if(dVal <= 21)
 		{
 			if(pVal > dVal)
@@ -169,12 +187,18 @@ public class Game
 				//player won
 				result = "player won";
 				p.returnWinnings(potValue);
+				amountInsured = 0;
 			}
 			
 			else if(pVal < dVal)
 			{
 				//player lost
 				result = "dealer won";
+				if (amountInsured != 0)
+				{
+					p.returnWinnings(amountInsured*2);
+					amountInsured = 0;
+				}
 			}
 			else
 			{
@@ -185,6 +209,8 @@ public class Game
 		else
 		{
 			result = "player won";
+			p.returnWinnings(potValue);
+			amountInsured = 0;
 		}
 		
 		/* TODO Resetting potValue here messes up the message that says player has Won. */
@@ -192,6 +218,21 @@ public class Game
 		
 		return result;
 		
+	}
+	
+	public int getAmtInsured()
+	{
+		return amountInsured;
+	}
+	
+	public boolean finalProblem()
+	{
+		if(p.getPlayerAccountBalance() == 0)
+		{
+			return true;
+		}
+		
+		return false;
 	}
 		
 	public void render(Graphics g, JPanel panel, boolean hideIn)
@@ -206,8 +247,10 @@ public class Game
 	/* Reset Game back to initial state */
 	public void reset()
 	{
+		lastAmountBet = amountBet;
 		amountBet = 0;
 		potValue = 0;
+		amountInsured = 0;
 		d.initializeDeck();
 		d.shuffleDeck();	
 		p.resetHand();
