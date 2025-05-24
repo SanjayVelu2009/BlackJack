@@ -3,6 +3,7 @@
 // Game logic class and text file class will be called in
 
 // Imports for the JFrame/Java Elements, etc.
+
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -17,6 +18,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.lang.NumberFormatException;
 import java.util.Scanner;
+import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -74,9 +76,10 @@ public class TrigJack
 	}
     public void runIt()
     {
+		//creating the frame
         JFrame frame = new JFrame("TrigJack");
         frame.setSize(1000, 800);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
         frame.setLocation(0, 50);
         frame.setResizable(true);
 
@@ -90,6 +93,7 @@ class ButtonStyler
 {
     public void styleButton(JButton button)
     {
+		//styling the buttons
         button.setBackground(new Color(255, 215, 0));
         button.setForeground(Color.BLACK);
         button.setFont(new Font("DialogInput", Font.BOLD, 18));
@@ -108,17 +112,16 @@ class TrigJackHolder extends JPanel
         StartMenu sm = new StartMenu(this, card);
         Instructions ins = new Instructions(this, card);
         Highscores hs = new Highscores(this, card);
-        PlayMenu pm = new PlayMenu(this, card);
         Problem prob = new Problem(this, card);
-        Solution sol = new Solution(this, card);
-        Names nam = new Names(this, card);
+        PlayMenu pm = new PlayMenu(this, card, prob);
+        Names nam = new Names(this, card, pm);
 
+		//adding all the panels to card layout
         add(sm, "Start");
         add(ins, "Instructions");
         add(hs, "Highscores");
         add(pm, "Playing");
         add(prob, "Problem");
-        add(sol, "Solution");
         add(nam, "Name");
 
         card.show(this, "Start");
@@ -143,10 +146,10 @@ class StartMenu extends JPanel implements ActionListener
         cards = cardsIn;
 
         setLayout(null);
-
+		//try catch file, loading image
         try
         {
-			backgroundImage = ImageIO.read(new File("images/background.jpeg"));
+			backgroundImage = ImageIO.read(new File("assets/background.jpeg"));		//background image in assets file
         }
         catch (IOException e)
         {
@@ -160,25 +163,25 @@ class StartMenu extends JPanel implements ActionListener
         titleLabel.setBounds(260, 50, 800, 100);
         add(titleLabel);
 
-        playButton = new JButton("Play");
+        playButton = new JButton("Play");			//play button
         playButton.setBounds(390, 300, 200, 60);
         styler.styleButton(playButton);
         playButton.addActionListener(this);
         add(playButton);
 
-        instructionsButton = new JButton("Instructions");
+        instructionsButton = new JButton("Instructions");	//instructions button
         instructionsButton.setBounds(390, 380, 200, 60);
         styler.styleButton(instructionsButton);
         instructionsButton.addActionListener(this);
         add(instructionsButton);
 
-        highScoresButton = new JButton("High Scores");
+        highScoresButton = new JButton("High Scores");	//highscores button
         highScoresButton.setBounds(390, 460, 200, 60);
         styler.styleButton(highScoresButton);
         highScoresButton.addActionListener(this);
         add(highScoresButton);
 
-        quitButton = new JButton("Quit");
+        quitButton = new JButton("Quit");			//quit button
         quitButton.setBounds(390, 540, 200, 60);
         styler.styleButton(quitButton);
         quitButton.addActionListener(this);
@@ -194,7 +197,7 @@ class StartMenu extends JPanel implements ActionListener
         }
     }
 
-    public void actionPerformed(ActionEvent evt)
+    public void actionPerformed(ActionEvent evt)	//action performed, performs the function of each button
     {
         Object src = evt.getSource();
 
@@ -250,7 +253,7 @@ class Instructions extends JPanel implements ActionListener
         home.addActionListener(this);
         add(home);
 
-        text = new JTextArea(30, 50);
+        text = new JTextArea(30, 50);		//instructions in JTextArea with JScrollPane
         text.setText("The game aims to bet against the dealer to see whose hand is closest to 21.\n\n" +
             "Cards:\n" +
             "- 2–10: Worth face value.\n" +
@@ -298,7 +301,7 @@ class Instructions extends JPanel implements ActionListener
 
     public void actionPerformed(ActionEvent evt)
     {
-        if (evt.getActionCommand().equals("Home"))
+        if (evt.getActionCommand().equals("Home"))		//home button function
         {
             cards.show(trigHolder, "Start");
         }
@@ -358,9 +361,9 @@ class Names extends JPanel implements ActionListener
     private JButton back;
     private boolean insure;
     private String playerName;
-    private PlayMenu pm = new PlayMenu(trigHolder, cards);
+    private PlayMenu pm;
 
-    public Names(TrigJackHolder trigHolderIn, CardLayout cardsIn)
+    public Names(TrigJackHolder trigHolderIn, CardLayout cardsIn, PlayMenu inPm)
     {
         try
         {
@@ -374,17 +377,18 @@ class Names extends JPanel implements ActionListener
 
         cards = cardsIn;
         trigHolder = trigHolderIn;
+        pm = inPm;
 
         setLayout(null);
         setBackground(new Color(53, 101, 77));
 
-        nameLabel = new JLabel("Enter Your Name:");
+        nameLabel = new JLabel("Enter Your Name:");			
         nameLabel.setForeground(Color.WHITE);
         nameLabel.setBounds(340, 300, 300, 30);
         nameLabel.setFont(new Font("DialogInput", Font.BOLD, 18));
         add(nameLabel);
 
-        name = new JTextField();
+        name = new JTextField();					//JTextField used for user input
         name.setBounds(340, 340, 300, 30);
         add(name);
         
@@ -405,6 +409,8 @@ class Names extends JPanel implements ActionListener
         styler.styleButton(play);
         play.addActionListener(this);
         add(play);
+        
+        //buttons navigating to different panels
     }
 
     public void actionPerformed(ActionEvent evt)
@@ -440,7 +446,7 @@ class Names extends JPanel implements ActionListener
     }
 
 
-    public void saveNameToFile(String name)
+    public void saveNameToFile(String name)			//write to file and saves name to a text file
     {
         try (FileWriter writer = new FileWriter("players.txt", true))
         {
@@ -467,6 +473,7 @@ class Names extends JPanel implements ActionListener
 
 class PlayMenu extends JPanel
 {
+	//components
 	private JSlider betting;
 	private JMenu menuOpt;
 	private JMenuBar menuBar;
@@ -474,6 +481,8 @@ class PlayMenu extends JPanel
 	private JButton insure;
 	private JButton hit;
 	private JButton stand;
+	private JButton better;
+	
 	private JMenuItem home;
 	private JMenuItem newGame;
 	
@@ -481,6 +490,8 @@ class PlayMenu extends JPanel
 	private JLabel playerBalance;
 	private JLabel instructions;
 	private JLabel insuranceLabel;
+	private JLabel dealerLabel;
+	private JLabel playerLabel;
 	
     private TrigJackHolder trigHolder;
     private CardLayout cards;
@@ -488,9 +499,9 @@ class PlayMenu extends JPanel
     private ButtonStyler styler = new ButtonStyler();
     private Image backgroundImage2;
     private JLabel moneyTrack;
-    private boolean insureCheck;
+    private boolean allowToInsure = false;
     
-    private Game game;
+    private Game game;		//game class, game functionality and logic 
     
     private String name = "";
     private Player player;
@@ -506,11 +517,14 @@ class PlayMenu extends JPanel
 	private boolean problemSwitch = false;
 	private int lastSliderPosition = 0;
 	private boolean successfulBetThisRound = false;
+	private boolean successfulDoubleDownThisRound = false;
+	private Problem problems;
 	
-    public PlayMenu(TrigJackHolder trigHolderIn, CardLayout cardsIn)
+    public PlayMenu(TrigJackHolder trigHolderIn, CardLayout cardsIn, Problem inProb)
     {
 		trigHolder = trigHolderIn;
 		cards = cardsIn;
+		problems = inProb;
            
         try
         {
@@ -538,11 +552,12 @@ class PlayMenu extends JPanel
 		cp.add(playerBalance);
 		cp.add(insuranceLabel);
 		cp.add(instructions);
+		cp.add(dealerLabel);
+		cp.add(playerLabel);
 		
         gameActive = true;
-		
-		saveName(name);
 		game = new Game(name);
+		problems.setGame(game);
 						
 		add(menuBar,BorderLayout.NORTH);
 		add(betting,BorderLayout.SOUTH);
@@ -558,8 +573,25 @@ class PlayMenu extends JPanel
     
     /* @TODO create Labels to reflect Pot Value and Players' current balance 
      * @TODO Position the labels right below the cards and above the slider */
-    public void createBettingLabels()
+     
+    public void createBettingLabels()			//creates labels to track the betting amounts
     {
+		dealerLabel = new JLabel("Dealer");
+		dealerLabel.setFont(new Font("Serif", Font.BOLD, 20));
+		dealerLabel.setForeground(new Color(0, 0, 255));
+		dealerLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		dealerLabel.setPreferredSize(new Dimension(0,25));
+		dealerLabel.setBounds(0, 10, 100, 30);
+		dealerLabel.setVisible(false);
+		
+		playerLabel = new JLabel("Player: "+name);
+		playerLabel.setFont(new Font("Serif", Font.BOLD, 20));
+		playerLabel.setForeground(new Color(0, 0, 255));
+		playerLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		playerLabel.setPreferredSize(new Dimension(0,25));
+		playerLabel.setBounds(0, 270, 100, 30);
+		playerLabel.setVisible(false);
+		
 		potValue = new JLabel("Pot Value: 0");
 		potValue.setFont(new Font("Serif", Font.BOLD, 20));
 		potValue.setForeground(new Color(255, 215, 0));
@@ -586,39 +618,37 @@ class PlayMenu extends JPanel
 		instructions.setHorizontalAlignment(SwingConstants.CENTER);
 		instructions.setForeground(new Color(255, 0, 0));
 		instructions.setPreferredSize(new Dimension(0,25));
-		instructions.setBounds(0, 650, 500, 30);
-		
-				
+		instructions.setBounds(0, 650, 700, 30);
 
 	} 
     
     /* @TODO Add another button called "Bet" to read from slider and commit the bet to Pot Value */
-    public void createButtons()
+    public void createButtons()									//buttons for game functionality
     {
-		buttonPanel = new JPanel();
+		buttonPanel = new JPanel();			//added to main game panel
 		buttonPanel.setLayout(new GridLayout(5,1));	
 			
-		hit = new JButton("Hit");
-		hit.addActionListener(new ButtonControl());
-		styler.styleButton(hit);
-		buttonPanel.add(hit);
+		hit = new JButton("Hit");			//hit button
+		hit.addActionListener(new ButtonControl());	//adds functionality by adding action listener
+		styler.styleButton(hit);		//styles button
+		buttonPanel.add(hit);			//adds to button panel
 		
-		stand = new JButton("Stand");
+		stand = new JButton("Stand");		//stand button
 		stand.addActionListener(new ButtonControl());
 		styler.styleButton(stand);		
 		buttonPanel.add(stand);
 		
-		doubleDown = new JButton("Double Down");
+		doubleDown = new JButton("Double Down");		//double down button
 		doubleDown.addActionListener(new ButtonControl());
 		styler.styleButton(doubleDown);
 		buttonPanel.add(doubleDown);
 		
-		JButton better = new JButton("Bet");	
+		better = new JButton("Bet");					//bet button
 		better.addActionListener(new ButtonControl());
 		styler.styleButton(better);
 		buttonPanel.add(better);
 		
-		JButton insure = new JButton("Insure");	
+		insure = new JButton("Insure");				//insure button	
 		insure.addActionListener(new ButtonControl());
 		styler.styleButton(insure);
 		buttonPanel.add(insure);
@@ -626,25 +656,30 @@ class PlayMenu extends JPanel
     
     public void createMainMenu()
     {
-		JMenuItem home = new JMenuItem("Home");
-		JMenuItem newGame = new JMenuItem("New Game");
+		//menu items being created
+		home = new JMenuItem("Home");
+		newGame = new JMenuItem("New Game");
 		
+		//action listeners being added for functionality
 		home.addActionListener(new MenuControl());
 		newGame.addActionListener(new MenuControl());
-			
+		
+		//JMenu holding menu items	
 		menuOpt = new JMenu("Options");
 		menuOpt.setForeground(new Color(255, 215, 0));
 		
 		menuOpt.add(home);
 		menuOpt.add(newGame);
 		
+		//Menu Bar holding JMenu and the menu items 
 		menuBar = new JMenuBar();
 		menuBar.add(menuOpt);
 	}
 	
     public void createBetSlider()
     {
-		betting = new JSlider(0,10000,0);
+		//Slider used for betting and insurance
+		betting = new JSlider(0,10000,0);		//goes up to 10000 and starts at 0
         betting.setMajorTickSpacing(500);
 	    betting.setPaintLabels(true);
 	    betting.setFont(new Font("Serif", Font.PLAIN,15));
@@ -653,7 +688,7 @@ class PlayMenu extends JPanel
 	    betting.setOrientation(JSlider.HORIZONTAL);
 	    betting.setSnapToTicks(true);
 	    	    
-	    betting.addChangeListener(new SliderControl());
+	    betting.addChangeListener(new SliderControl());			//adding change listener for functionality of slider
 	}
 	
 	class MenuControl implements ActionListener
@@ -662,14 +697,14 @@ class PlayMenu extends JPanel
 		{
 			if(evt.getActionCommand().equals("Home"))
 			{
-				cards.show(trigHolder, "Start");
+				cards.show(trigHolder, "Start");			//goes to start page
 			}
 			else if(evt.getActionCommand().equals("New Game"))	
 			{
 				gameActive = true;
-				hide = true;
+				hide = true;							//hides the dealer card
 				successfulBetThisRound = false;
-				game.reset();
+				game.reset();							//resets everything
 				instructions.setText("Place your bets! Minimum Bet: $5000");
 				repaint();
 				
@@ -682,7 +717,7 @@ class PlayMenu extends JPanel
 	{
 		public void stateChanged(ChangeEvent evt)
 		{	
-			lastSliderPosition = betting.getValue();				
+			lastSliderPosition = betting.getValue();			//getting the last position			
 		}
 	}
 	
@@ -690,47 +725,43 @@ class PlayMenu extends JPanel
 	class ButtonControl implements ActionListener
 	{
 		
-		public void handleHit()
+		public void handleHit()		//handles hit logic
 		{
-			game.dealCards(true);
+			game.dealCards(true);	//deals the cards boolean passed in to see if cards are dealt to player only or to everyone
 	
 			repaint();
 			
-			boolean checkingBlackJack = game.playerBustCheck();
+			if (game.playerBustCheck())		//checks if the player bust
+				closeCurrentRound(true);	//finishes the round boolean passed to see if player busted or not
 			
-			if(checkingBlackJack == true)
-			{
-				instructions.setText("Player busted Lost $"+(game.getPotValue()/2)+" this round.");
-				hide = false; 
-				gameActive = false;
-				repaint();
-				JOptionPane.showMessageDialog(null, "Player busted Lost $"+(game.getPotValue()/2)+" this round.");
-				game.reset();
-				cards.show(trigHolder, "Problem");
-			}
 		} /* handleHit */
 		
 		public void handleBet()
 		{
 			betAmount = lastSliderPosition;
-			System.out.println("Amount Bet: "+betAmount);
-			betAmount = game.placeBet(betAmount);
+			//System.out.println("Amount Bet: "+betAmount);
+			betAmount = game.placeBet(betAmount);				//places bet with the amount saved with the slider and button
 			
 			if (betAmount > 0)
 			{
 				successfulBetThisRound = true;
 				System.out.println("Dealing Cards");
-				boolean insurance = game.dealCards(false);
+				dealerLabel.setVisible(true);
+				playerLabel.setVisible(true);
+				boolean insurance = game.dealCards(false);		//checks if insurance is possible
 				
 				if (insurance)
 				{
+					/* TODO Only allow user to "Insure" in this state */
 					instructions.setText("Use the slider to choose insurance amount ($0 to half of BetAmt) \n Press Insure button to place your insurance bet");
+					allowToInsure = true;
 					repaint();
 				} 
 				else
 				{
 					System.out.println("Dealing 2nd set of cards");
 					game.dealCards(false); 
+					allowToInsure = false;
 					instructions.setText("Player to decide Hit or Stand!");
 					repaint();	
 				}
@@ -765,32 +796,66 @@ class PlayMenu extends JPanel
 			
 			repaint();
 			
-			/* Settle Game */
-			String result = game.settle();
+			closeCurrentRound(false);
+		}
+		
+		public void closeCurrentRound(boolean playerWentBust)
+		{
+			/* Update Instructions to start a new game */
 			
-			if(result.equals("dealer won"))
+			if (playerWentBust)
 			{
-				System.out.println("dealer won");
-				JOptionPane.showMessageDialog(null,"You Lost $"+(game.getPotValue()/2)+" this round.\nTime to solve a problem!");
-				problemSwitch = true;
-				game.reset();
+				instructions.setText("Player busted Lost $"+(game.getPotValue()/2)+" this round.");
+				hide = false; 
+				repaint();
+				JOptionPane.showMessageDialog(null, "Player busted Lost $"+(game.getPotValue()/2)+" this round.");
+				problems.loadNextQuestion();
 				cards.show(trigHolder, "Problem");
-			}
-			else if(result.equals("player won"))
-			{
-				System.out.println("player won");
-				JOptionPane.showMessageDialog(null,"You won $"+(game.getPotValue()/2)+" this round!");
 			}
 			else
 			{
-				System.out.println("Its a push");
-				JOptionPane.showMessageDialog(null,"It's a push! You lost nothing!"); 
+				/* Settle Game */
+				String result = game.settle();
+			
+				/* TODO */
+				if(result.equals("dealer won"))
+				{
+					System.out.println("dealer won");
+					JOptionPane.showMessageDialog(null,"You Lost $"+(game.getPotValue()/2)+" this round.\nTime to solve a problem!");
+					problemSwitch = true;		//goes to problem panel and loads a question
+					repaint();
+					problems.loadNextQuestion();
+					cards.show(trigHolder, "Problem");
+				}
+				else if(result.equals("player won"))
+				{
+					System.out.println("player won");
+					repaint();
+					JOptionPane.showMessageDialog(null,"You won $"+(game.getPotValue()/2)+" this round!");
+				}
+				else
+				{
+					System.out.println("Its a push");
+					repaint();
+					JOptionPane.showMessageDialog(null,"It's a push! You lost nothing!"); 
+				}
 			}
-			game.reset();
+			
+			instructions.setText("Round Ended! Start a new game to continue playing.");
+			
 			repaint();
+			game.reset();
+			dealerLabel.setVisible(false);
+			playerLabel.setVisible(false);
 			gameActive = false;
-		}
+			successfulBetThisRound = false;
+			successfulDoubleDownThisRound = false;
+			allowToInsure = false;
+	
+
+		} /* closeCurrentRound */
 		
+		/* TODO Update Insurance Label to r to insure amount */
 		public void handleInsure()
 		{
 			
@@ -799,6 +864,7 @@ class PlayMenu extends JPanel
 			if(game.insure(insureAmt))
 			{
 				game.dealCards(false);
+				allowToInsure = false;
 				instructions.setText("Player to decide Hit or Stand!");
 			}
 			else
@@ -816,25 +882,26 @@ class PlayMenu extends JPanel
 			{
 				instructions.setText("Error! No Active Game. Start a new game!");
 			}
-			else if ((evt.getActionCommand().equals("Hit")) && successfulBetThisRound)
+			else if ((evt.getActionCommand().equals("Hit")) && successfulBetThisRound && !allowToInsure && !successfulDoubleDownThisRound)
 			{
 				handleHit();
 			}
-			else if ((evt.getActionCommand().equals("Bet")) && (!successfulBetThisRound))
+			else if ((evt.getActionCommand().equals("Bet")) && (!successfulBetThisRound) && !allowToInsure && !successfulDoubleDownThisRound)
 			{
 				handleBet();
 			}
-			else if ((evt.getActionCommand().equals("Stand")) && successfulBetThisRound)
+			else if ((evt.getActionCommand().equals("Stand")) && successfulBetThisRound && !allowToInsure && !successfulDoubleDownThisRound)
 			{
 				handleStand();
 			}
-			else if ((evt.getActionCommand().equals("Insure")) && successfulBetThisRound)
+			else if ((evt.getActionCommand().equals("Insure")) && successfulBetThisRound && allowToInsure && !successfulDoubleDownThisRound)
 			{
 				handleInsure();
 			}
-			else if ((evt.getActionCommand().equals("Double Down")) && successfulBetThisRound)
+			else if ((evt.getActionCommand().equals("Double Down")) && successfulBetThisRound && !allowToInsure && !successfulDoubleDownThisRound)
 			{
-				game.playerDoubleDown();
+				successfulDoubleDownThisRound = game.playerDoubleDown();
+				handleStand();
 				repaint();
 			}
 		} /* actionPerformed */
@@ -864,6 +931,7 @@ class PlayMenu extends JPanel
 			
 			playerBalance.setText("Balance: $"+game.getPlayerAccountBalance());
 			potValue.setText("Pot Value: $"+game.getPotValue());
+			insuranceLabel.setText("Insurance: "+game.getAmtInsured());
 
 			game.render(g, this, hide);
 			
@@ -871,225 +939,4 @@ class PlayMenu extends JPanel
 	}
 }
 
-class Problem extends JPanel implements ActionListener
-{
-    public JButton option1, option2, option3, option4;
-    public ButtonStyler styler = new ButtonStyler();
-    public JLabel questionLabel;
-    public JButton homeButton;
-    public Scanner input;
-    public int correctOption;
-    public TrigJackHolder trigHolder;
-    public CardLayout cards;
-    public Image backgroundImage;
 
-    public Problem(TrigJackHolder trigHolderIn, CardLayout cardsIn)
-    {
-        trigHolder = trigHolderIn;
-        cards = cardsIn;
-
-        setLayout(null);
-
-        try
-        {
-            backgroundImage = ImageIO.read(new File("images/background.jpeg"));
-        }
-        catch (IOException e)
-        {
-            System.err.println("Background image not found: " + e.getMessage());
-            setBackground(new Color(53, 101, 77));
-        }
-
-        questionLabel = new JLabel("");
-        questionLabel.setForeground(Color.WHITE);
-        questionLabel.setFont(new Font("DialogInput", Font.BOLD, 24));
-        questionLabel.setOpaque(true);
-        questionLabel.setBackground(new Color(0, 0, 0, 180));
-        questionLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        questionLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        questionLabel.setBounds(25, 30, 950, 120);
-        add(questionLabel);
-
-        option1 = new JButton();
-        option2 = new JButton();
-        option3 = new JButton();
-        option4 = new JButton();
-
-        Color[] buttonColors = {new Color(219, 68, 55), new Color(66, 133, 244), new Color(244, 180, 0), new Color(15, 157, 88)};
-
-        int buttonWidth = 300;
-        int buttonHeight = 80;
-        int gridWidth = buttonWidth * 2 + 20;
-        int gridHeight = buttonHeight * 2 + 20;
-        int gridX = (1000 - gridWidth) / 2;
-        int gridY = (800 - gridHeight - 120 - 80 - 50) / 2 + 120;
-
-        option1.setBounds(gridX, gridY, buttonWidth, buttonHeight);
-        option2.setBounds(gridX + buttonWidth + 20, gridY, buttonWidth, buttonHeight);
-        option3.setBounds(gridX, gridY + buttonHeight + 20, buttonWidth, buttonHeight);
-        option4.setBounds(gridX + buttonWidth + 20, gridY + buttonHeight + 20, buttonWidth, buttonHeight);
-
-        int i;
-        for (i = 0; i < 4; i++)
-        {
-            JButton btn;
-            if (i == 0) btn = option1;
-            else if (i == 1) btn = option2;
-            else if (i == 2) btn = option3;
-            else btn = option4;
-            btn.setBackground(buttonColors[i]);
-            btn.setForeground(Color.BLACK);
-            btn.setFont(new Font("DialogInput", Font.BOLD, 16));
-            btn.setFocusPainted(false);
-            btn.setOpaque(true);
-            btn.setBorderPainted(true);
-            btn.addActionListener(this);
-            add(btn);
-        }
-
-        homeButton = new JButton("Home");
-        styler.styleButton(homeButton);
-        homeButton.setBounds(425, 700, 150, 50);
-        homeButton.addActionListener(this);
-        add(homeButton);
-
-        try
-        {
-            input = new Scanner(new File("TrigQuestions.txt"));
-        }
-        catch (Exception e)
-        {
-            questionLabel.setText("Could not load questions.");
-            option1.setEnabled(false);
-            option2.setEnabled(false);
-            option3.setEnabled(false);
-            option4.setEnabled(false);
-            return;
-        }
-
-        loadNextQuestion();
-    }
-
-    public void loadNextQuestion()
-    {
-        if (input.hasNextLine())
-        {
-            String q = input.nextLine();
-            String a1 = input.nextLine();
-            String a2 = input.nextLine();
-            String a3 = input.nextLine();
-            String a4 = input.nextLine();
-            String correctStr = input.nextLine();
-
-            questionLabel.setText("<html><body style='width: 900px; text-align: center; padding: 10px;'>" + q + "</body></html>");
-            option1.setText("<html>A. " + a1 + "</html>");
-            option2.setText("<html>B. " + a2 + "</html>");
-            option3.setText("<html>C. " + a3 + "</html>");
-            option4.setText("<html>D. " + a4 + "</html>");
-
-            option1.setBackground(new Color(219, 68, 55));
-            option2.setBackground(new Color(66, 133, 244));
-            option3.setBackground(new Color(244, 180, 0));
-            option4.setBackground(new Color(15, 157, 88));
-            option1.setForeground(Color.BLACK);
-            option2.setForeground(Color.BLACK);
-            option3.setForeground(Color.BLACK);
-            option4.setForeground(Color.BLACK);
-
-            option1.setEnabled(true);
-            option2.setEnabled(true);
-            option3.setEnabled(true);
-            option4.setEnabled(true);
-
-            correctOption = Integer.parseInt(correctStr.trim());
-        }
-        else
-        {
-            questionLabel.setText("No more questions!");
-            option1.setEnabled(false);
-            option2.setEnabled(false);
-            option3.setEnabled(false);
-            option4.setEnabled(false);
-        }
-    }
-
-    public void actionPerformed(ActionEvent evt)
-    {
-        if (evt.getSource() == homeButton)
-        {
-            cards.show(trigHolder, "Start");
-        }
-
-        int selected = 0;
-        JButton selectedButton = null;
-
-        if (evt.getSource() == option1)
-        {
-            selected = 1;
-            selectedButton = option1;
-            cards.show(trigHolder, "Playing");
-        }
-        else if (evt.getSource() == option2)
-        {
-            selected = 2;
-            selectedButton = option2;
-            cards.show(trigHolder, "Playing");
-
-        }
-        else if (evt.getSource() == option3)
-        {
-            selected = 3;
-            selectedButton = option3;
-            cards.show(trigHolder, "Playing");
-
-        }
-        else if (evt.getSource() == option4)
-        {
-            selected = 4;
-            selectedButton = option4;
-            cards.show(trigHolder, "Playing");
-        }
-
-        if (selected > 0)
-        {
-            option1.setEnabled(false);
-            option2.setEnabled(false);
-            option3.setEnabled(false);
-            option4.setEnabled(false);
-
-            if (selected == correctOption)
-            {
-                selectedButton.setBackground(new Color(0, 255, 0));
-                JOptionPane.showMessageDialog(this, "Correct! Returning to game.");
-                cards.show(trigHolder, "Playing");
-            }
-            else
-            {
-                selectedButton.setBackground(new Color(255, 0, 0));
-                JOptionPane.showMessageDialog(this, "Incorrect. Correct answer was option " + correctOption + ". Try another question.");
-                if (correctOption == 1) option1.setBackground(new Color(0, 255, 0));
-                else if (correctOption == 2) option2.setBackground(new Color(0, 255, 0));
-                else if (correctOption == 3) option3.setBackground(new Color(0, 255, 0));
-                else if (correctOption == 4) option4.setBackground(new Color(0, 255, 0));
-
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask()
-                {
-                    public void run()
-                    {
-                        loadNextQuestion();
-                    }
-                }, 1000);
-            }
-        }
-    }
-
-    public void paintComponent(Graphics g)
-    {
-        super.paintComponent(g);
-        if (backgroundImage != null)
-        {
-            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-        }
-    }
-}
