@@ -104,30 +104,39 @@ class ButtonStyler
 
 class TrigJackHolder extends JPanel
 {
+    private CardLayout card;
+    private Highscores highscoresPanel;
+
     public TrigJackHolder()
     {
-        CardLayout card = new CardLayout();
+        card = new CardLayout();
         setLayout(card);
 
         StartMenu sm = new StartMenu(this, card);
         Instructions ins = new Instructions(this, card);
-        Highscores hs = new Highscores(this, card);
+        highscoresPanel = new Highscores(this, card);
         Problem prob = new Problem(this, card);
         PlayMenu pm = new PlayMenu(this, card, prob);
         Names nam = new Names(this, card, pm);
+		Finish fin = new Finish(this, card, pm);
 
 		//adding all the panels to card layout
         add(sm, "Start");
-        add(ins, "Instructions");
-        add(hs, "Highscores");
+        add(ins, "Instructions");		
+		add(highscoresPanel, "Highscores");
+
         add(pm, "Playing");
         add(prob, "Problem");
         add(nam, "Name");
+		add(fin, "Finish");
 
         card.show(this, "Start");
     }
     
-   
+    public Highscores getHighscoresPanel()
+    {
+        return highscoresPanel;
+    }
 }
 
 class StartMenu extends JPanel implements ActionListener
@@ -211,11 +220,12 @@ class StartMenu extends JPanel implements ActionListener
         }
         else if (src == highScoresButton)
         {
+		    trigHolder.getHighscoresPanel().refresh();
             cards.show(trigHolder, "Highscores");
         }
         else if (src == quitButton)
         {
-            System.exit(1);
+            System.exit(0);
         }
     }
 }
@@ -244,7 +254,7 @@ class Instructions extends JPanel implements ActionListener
         catch (IOException e)
         {
             System.err.println("Instructions image not found: " + e.getMessage());
-            setBackground(new Color(53, 0, 77));
+            setBackground(new Color(53, 101, 77));
         }
 
         home = new JButton("Home");
@@ -279,17 +289,17 @@ class Instructions extends JPanel implements ActionListener
             "Dealer Rules:\n" +
             "- Dealer reveals second card after player.\n" +
             "- Dealer hits or stands according to standard rules.\n\n" +
-            "Trig Challenge on Bust:\n" +
+            "Trig Challenge on Bust or Loss:\n" +
             "- Correct answer: Lose half bet.\n" +
             "- Incorrect answer: Lose full bet.\n" +
             "- Wrong? Step-by-step solution shown.\n\n" +
             "Winning & Losing:\n" +
             "- Start: $1000.\n" +
-            "- Goal: Reach $10,000 to win.\n" +
+            "- Goal: Reach $20,000 to win.\n" +
             "- Lose: Bankrupt.\n" +
             "- Final Challenge if bankrupt.\n\n" +
             "High Scores:\n" +
-            "- The lowest number of rounds to reach $10000 is on the leaderboard!\n\n");
+            "- The lowest number of rounds to reach $20,000 is on the leaderboard!\n\n");
         text.setWrapStyleWord(true);
         text.setLineWrap(true);
         text.setEditable(false);
@@ -322,7 +332,10 @@ class Highscores extends JPanel implements ActionListener
     private TrigJackHolder trigHolder;
     private CardLayout cards;
     private JButton home;
+    private JTextArea text;
+    private JScrollPane highscoresPane;
     private ButtonStyler styler = new ButtonStyler();
+    private Image backgroundImage;
 
     public Highscores(TrigJackHolder trigHolderIn, CardLayout cardsIn)
     {
@@ -330,22 +343,183 @@ class Highscores extends JPanel implements ActionListener
         trigHolder = trigHolderIn;
 
         setLayout(null);
-        setBackground(new Color(53, 101, 77));
+
+        try
+        {
+            backgroundImage = ImageIO.read(new File("instructions.jpeg"));
+        }
+        catch (IOException e)
+        {
+            System.err.println("Instructions image not found: " + e.getMessage());
+            setBackground(new Color(53, 101, 77));
+        }
 
         home = new JButton("Home");
         home.setBounds(390, 700, 200, 60);
         styler.styleButton(home);
         home.addActionListener(this);
         add(home);
+
+        text = new JTextArea(30, 50);
+        text.setFont(new Font("DialogInput", Font.PLAIN, 16));
+        text.setForeground(new Color(255, 215, 0));
+        text.setBackground(new Color(53, 101, 77));
+        text.setWrapStyleWord(true);
+        text.setLineWrap(true);
+        text.setEditable(false);
+
+        highscoresPane = new JScrollPane(text);
+        highscoresPane.setBounds(50, 50, 900, 600);
+        add(highscoresPane);
+
+        loadHighScores();
+    }
+
+    public void refresh()
+    {
+        System.out.println("Refreshing Highscores panel");
+        loadHighScores();
+    }
+
+    public void loadHighScores()
+    {
+        int maxEntries = 100;
+        String[] names = new String[maxEntries];
+        int[] rounds = new int[maxEntries];
+        int validEntries = 0;
+
+        Scanner scanner = null;
+        try
+        {
+            File file = new File("highscores.txt");
+            System.out.println("Attempting to read highscores.txt at: " + file.getAbsolutePath());
+            System.out.println("File exists: " + file.exists());
+            scanner = new Scanner(file);
+            int index = 0;
+            while (scanner.hasNextLine() && index < maxEntries)
+            {
+                String line = scanner.nextLine();
+                System.out.println("Reading line: " + line);
+                if (line.length() == 0)
+                {
+                    System.out.println("Skipping empty line");
+                }
+                else
+                {
+                    int commaIndex = line.indexOf(",");
+                    if (commaIndex > 0 && commaIndex < line.length() - 1)
+                    {
+                        String namePart = line.substring(0, commaIndex).trim();
+                        String roundsPart = line.substring(commaIndex + 1).trim();
+                        System.out.println("Name: " + namePart + ", Rounds: " + roundsPart);
+                        boolean isNumber = true;
+                        int i = 0;
+                        while (i < roundsPart.length())
+                        {
+                            char c = roundsPart.charAt(i);
+                            if (c < '0' || c > '9')
+                            {
+                                isNumber = false;
+                            }
+                            i = i + 1;
+                        }
+                        if (isNumber && roundsPart.length() > 0 && namePart.length() > 0)
+                        {
+                            int roundCount = Integer.parseInt(roundsPart);
+                            if (roundCount >= 0)
+                            {
+                                names[index] = namePart;
+                                rounds[index] = roundCount;
+                                validEntries = validEntries + 1;
+                                index = index + 1;
+                                System.out.println("Valid entry added: " + namePart + ", " + roundCount);
+                            }
+                            else
+                            {
+                                System.out.println("Skipping negative rounds: " + roundCount);
+                            }
+                        }
+                        else
+                        {
+                            System.out.println("Skipping invalid rounds or empty name: " + line);
+                        }
+                    }
+                    else
+                    {
+                        System.out.println("Skipping invalid line format: " + line);
+                    }
+                }
+            }
+            scanner.close();
+            System.out.println("Total valid entries: " + validEntries);
+        }
+        catch (Exception e)
+        {
+            if (scanner != null)
+            {
+                scanner.close();
+            }
+            System.err.println("Error reading highscores.txt: " + e.getMessage());
+            text.setText("No high scores available.");
+            return;
+        }
+
+        if (validEntries == 0)
+        {
+            text.setText("No high scores available.");
+            System.out.println("No valid high scores found");
+            return;
+        }
+
+        int i = 0;
+        while (i < validEntries - 1)
+        {
+            int j = 0;
+            while (j < validEntries - i - 1)
+            {
+                if (rounds[j] > rounds[j + 1])
+                {
+                    int tempRounds = rounds[j];
+                    rounds[j] = rounds[j + 1];
+                    rounds[j + 1] = tempRounds;
+                    String tempName = names[j];
+                    names[j] = names[j + 1];
+                    names[j + 1] = tempName;
+                    System.out.println("Swapped: " + names[j] + " (" + rounds[j] + ") with " + names[j + 1] + " (" + rounds[j + 1] + ")");
+                }
+                j = j + 1;
+            }
+            i = i + 1;
+        }
+
+        text.setText("High Scores - Players Who Reached $20,000\n\n");
+        i = 0;
+        while (i < validEntries)
+        {
+            String scoreLine = (i + 1) + ". " + names[i] + " - " + rounds[i] + " rounds\n";
+            text.append(scoreLine);
+            System.out.println("Displaying: " + scoreLine.trim());
+            i = i + 1;
+        }
     }
 
     public void actionPerformed(ActionEvent evt)
     {
         if (evt.getActionCommand().equals("Home"))
         {
+            refresh(); // Refresh before leaving to ensure next visit has fresh data
             cards.show(trigHolder, "Start");
         }
     }
+
+    public void paintComponent(Graphics g)
+    {
+        super.paintComponent(g);
+        if (backgroundImage != null)
+        {
+            g.drawImage(backgroundImage, 0,0, getWidth(), getHeight(), this);
+    	}
+}
 }
 
 class Names extends JPanel implements ActionListener
@@ -371,8 +545,8 @@ class Names extends JPanel implements ActionListener
         }
         catch (IOException e)
         {
-            System.err.println("Instructions image not found: " + e.getMessage());
-            setBackground(new Color(53, 0, 77));
+            System.err.println("Error loading instructions image: " + e.getMessage());
+            setBackground(new Color(53, 101, 77));
         }
 
         cards = cardsIn;
@@ -425,40 +599,39 @@ class Names extends JPanel implements ActionListener
             }
             else if (understand.isSelected() == false)
             {
-				nameLabel.setText("Please review the instructions!");
-				nameLabel.setForeground(Color.RED);
-			}
+                nameLabel.setText("Please review the instructions!");
+                nameLabel.setForeground(Color.RED);
+            }
             else
             {
                 saveNameToFile(playerName);
                 nameLabel.setText("Enter Your Name:");
                 nameLabel.setForeground(Color.WHITE);
+                pm.saveName(playerName);
                 cards.show(trigHolder, "Playing");
             }
         }
         else if (evt.getActionCommand().equals("Home"))
         {
-			cards.show(trigHolder, "Start");
-		}
-		
-		playerName = name.getText();
-		pm.saveName(playerName);
+            cards.show(trigHolder, "Start");
+        }
+        
+        playerName = name.getText().trim();
+        pm.saveName(playerName);
     }
 
-
-    public void saveNameToFile(String name)			//write to file and saves name to a text file
+    public void saveNameToFile(String name)
     {
-        try (FileWriter writer = new FileWriter("players.txt", true))
+        try
         {
+            FileWriter writer = new FileWriter("players.txt", true);
             writer.write(name + "\n");
+            writer.close();
         }
         catch (IOException e)
         {
             System.err.println("Error saving name: " + e.getMessage());
         }
-        
-        
-       
     }
 
     public void paintComponent(Graphics g)
@@ -509,6 +682,8 @@ class PlayMenu extends JPanel
     private int insureAmt;
     private boolean gameActive;
 
+    private int roundCount; // Track rounds
+
 	private JPanel centerPanel;
 	private JPanel buttonPanel;
 	
@@ -517,6 +692,9 @@ class PlayMenu extends JPanel
 	private boolean problemSwitch = false;
 	private int lastSliderPosition = 0;
 	private boolean successfulBetThisRound = false;
+	
+	private boolean initialDealDone = false;
+	
 	private boolean successfulDoubleDownThisRound = false;
 	private Problem problems;
 	
@@ -532,8 +710,8 @@ class PlayMenu extends JPanel
         }
         catch (IOException e)
         {
-            System.err.println("Instructions image not found: " + e.getMessage());
-            setBackground(new Color(53, 0, 77));
+            System.err.println("Error loading instructions image: " + e.getMessage());
+            setBackground(new Color(53, 101, 77));
         }
         /*Main Panels*/   
         setLayout(new BorderLayout());
@@ -556,6 +734,7 @@ class PlayMenu extends JPanel
 		cp.add(playerLabel);
 		
         gameActive = true;
+		roundCount = 0; // Initialize round count
 		game = new Game(name);
 		problems.setGame(game);
 						
@@ -704,6 +883,9 @@ class PlayMenu extends JPanel
 				gameActive = true;
 				hide = true;							//hides the dealer card
 				successfulBetThisRound = false;
+				initialDealDone = false;
+                roundCount++; // Increment Round Count
+ 
 				game.reset();							//resets everything
 				instructions.setText("Place your bets! Minimum Bet: $5000");
 				repaint();
@@ -746,6 +928,8 @@ class PlayMenu extends JPanel
 			{
 				successfulBetThisRound = true;
 				System.out.println("Dealing Cards");
+				initialDealDone = true;
+				System.out.println("Round " + roundCount + " started");
 				dealerLabel.setVisible(true);
 				playerLabel.setVisible(true);
 				boolean insurance = game.dealCards(false);		//checks if insurance is possible
@@ -852,18 +1036,24 @@ class PlayMenu extends JPanel
 			successfulDoubleDownThisRound = false;
 			allowToInsure = false;
 	
+			if (game.getPlayerAccountBalance() >= 20000)
+            {
+				System.out.println("Switching to Finish panel with name=" + name + ", rounds=" + roundCount);
+                cards.show(trigHolder, "Finish");
+            }
+
 
 		} /* closeCurrentRound */
 		
 		/* TODO Update Insurance Label to r to insure amount */
-		public void handleInsure()
+		public void handleInsure()		
 		{
 			
-			insureAmt = lastSliderPosition;
+			insureAmt = lastSliderPosition;			//gets the last slider position and sets it as 
 			
 			if(game.insure(insureAmt))
 			{
-				game.dealCards(false);
+				game.dealCards(false);				//deals cards 
 				allowToInsure = false;
 				instructions.setText("Player to decide Hit or Stand!");
 			}
@@ -877,7 +1067,7 @@ class PlayMenu extends JPanel
 		
 		public void actionPerformed(ActionEvent evt)
 		{
-			
+			//calling methods for each button action command
 			if (!gameActive)
 			{
 				instructions.setText("Error! No Active Game. Start a new game!");
@@ -912,10 +1102,19 @@ class PlayMenu extends JPanel
     {
 		name = naming;
 		System.out.println(name);
-	}
+    }
     
-	
-	class CardsPanel extends JPanel
+    public String getPlayerName()
+    {
+        return name;
+    }
+    
+    public int getRoundCount()
+    {
+        return roundCount;
+    }
+
+	class CardsPanel extends JPanel		//center panel where the cards show up
 	{
 		public CardsPanel()
 		{
@@ -928,7 +1127,7 @@ class PlayMenu extends JPanel
 		{
 			
 			super.paintComponent(g);
-			
+			//making the labels show up
 			playerBalance.setText("Balance: $"+game.getPlayerAccountBalance());
 			potValue.setText("Pot Value: $"+game.getPotValue());
 			insuranceLabel.setText("Insurance: "+game.getAmtInsured());
@@ -939,4 +1138,166 @@ class PlayMenu extends JPanel
 	}
 }
 
+/* class Finish extends JPanel implements ActionListener
+{
+		JLabel congratulate;
+		JButton back;
+		CardLayout cards;
+		TrigJackHolder trigHolder;
+		
+		public Finish(TrigJackHolder trigHolderIn, CardLayout cardsIn)
+		{
+			
+			trigHolder = trigHolderIn;
+			cards = cardsIn;
+			
+			setLayout(null);
+			setBackground(Color.YELLOW);
+			
+			String congrats = "Congrats! You reached $20000 in our game! \n You have became a profecient gambler! \n Would you like to play again?";
+			
+			congratulate = new JLabel("<html><body style='width: 900px; text-align: center; padding: 10px;'>" + congrats + "</body></html>");
+			congratulate.setFont(new Font("Serif", Font.BOLD, 20));
+			congratulate.setHorizontalAlignment(SwingConstants.CENTER);
+			congratulate.setForeground(new Color(0, 0, 0));
+			congratulate.setPreferredSize(new Dimension(0,25));
+			congratulate.setBounds(0, 300, 700, 30);
+			
+			add(congratulate);
+			
+			back = new JButton("Home");
+			back.setBounds(270, 700, 200, 60);
+			back.addActionListener(this);
+			add(back);
+		}
+		
+		public void actionPerformed(ActionEvent evt)
+		{
+			if (evt.getActionCommand().equals("Home"))
+			{
+				cards.show(trigHolder, "Start");
+			}
+        }
+		
+		public void paintComponent(Graphics g)
+		{
+			
+			
+		}
+	
 
+} */
+
+class Finish extends JPanel implements ActionListener
+{
+    private TrigJackHolder trigHolder;
+    private CardLayout cards;
+    private JButton home, newGame;
+    private JLabel messageLabel;
+    private ButtonStyler styler = new ButtonStyler();
+    private Image backgroundImage;
+    private boolean scoreSaved = false; // Prevent multiple saves
+
+    public Finish(TrigJackHolder trigHolderIn, CardLayout cardsIn, PlayMenu playMenu)
+    {
+        cards = cardsIn;
+        trigHolder = trigHolderIn;
+
+        setLayout(null);
+
+        try
+        {
+            backgroundImage = ImageIO.read(new File("instructions.jpeg"));
+        }
+        catch (IOException e)
+        {
+            System.err.println("Instructions image not found: " + e.getMessage());
+            setBackground(new Color(53, 101, 77));
+        }
+
+        String playerName = playMenu.getPlayerName();
+        if (playerName == null || playerName.trim().isEmpty())
+        {
+            playerName = "Anonymous";
+        }
+        int rounds = playMenu.getRoundCount();
+        System.out.println("Finish panel: playerName=" + playerName + ", rounds=" + rounds);
+
+        messageLabel = new JLabel("Congratulations, " + playerName + "! You reached $20,000 in " + rounds + " rounds!");
+        messageLabel.setFont(new Font("DialogInput", Font.BOLD, 24));
+        messageLabel.setForeground(new Color(255, 215, 0));
+        messageLabel.setBounds(50, 50, 900, 100);
+        messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        add(messageLabel);
+
+        home = new JButton("Home");
+        home.setBounds(270, 700, 200, 60);
+        styler.styleButton(home);
+        home.addActionListener(this);
+        add(home);
+
+        newGame = new JButton("New Game");
+        newGame.setBounds(520, 700, 200, 60);
+        styler.styleButton(newGame);
+        newGame.addActionListener(this);
+        add(newGame);
+
+        saveHighScore(playerName, rounds);
+    }
+
+    private void saveHighScore(String name, int rounds)
+    {
+        if (scoreSaved)
+        {
+            System.out.println("Score already saved for this session");
+            return;
+        }
+
+        if (name == null || name.trim().isEmpty())
+        {
+            name = "Anonymous";
+        }
+        if (rounds < 0)
+        {
+            rounds = 0;
+        }
+        System.out.println("Attempting to save high score: " + name + "," + rounds);
+
+        try
+        {
+            File file = new File("highscores.txt");
+            System.out.println("Writing to: " + file.getAbsolutePath());
+            System.out.println("File exists: " + file.exists());
+            FileWriter writer = new FileWriter(file, true);
+            writer.write(name + "," + rounds + "\n");
+            writer.close();
+            System.out.println("Saved high score: " + name + "," + rounds);
+            scoreSaved = true;
+        }
+        catch (IOException e)
+        {
+            System.err.println("Error saving high score: " + e.getMessage());
+        }
+    }
+
+    public void actionPerformed(ActionEvent evt)
+    {
+        if (evt.getActionCommand().equals("Home"))
+        {
+            cards.show(trigHolder, "Start");
+        }
+        else if (evt.getActionCommand().equals("New Game"))
+        {
+            cards.show(trigHolder, "Name");
+        }
+    }
+
+    public void paintComponent(Graphics g)
+    {
+        super.paintComponent(g);
+        if (backgroundImage != null)
+        {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
+    }
+}
