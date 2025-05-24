@@ -68,15 +68,15 @@ public class Game
 		}
 
 		Card playerCard = d.dealCard();
-		p.dealCard(playerCard);
+		p.dealCard(playerCard);		//deals the card to the player
 
-		return checkForInsurance;
+		return checkForInsurance;		//returns the insurance check
 	}
 	
 	public boolean insure(int insuranceAmount)
 	{
 		
-		if((insuranceAmount > 0) && (amountBet > 0) && (amountBet/2 >= insuranceAmount))
+		if((insuranceAmount > 0) && (amountBet > 0) && (amountBet/2 >= insuranceAmount))	//seeing if the insurance amount is probable in the game
 		{
 			if (p.insure(insuranceAmount))
 			{
@@ -88,9 +88,9 @@ public class Game
 		return false;
 	}
 	
-	/* @TODO implement playerDoubleDown */
 	public boolean playerDoubleDown()
 	{
+		//double down, where the bet gets doubled and the player automatically hits, ending their turn
 		boolean doubleDownSuccess = false;
 		
 		
@@ -105,7 +105,7 @@ public class Game
 		
 	}
 	
-	public boolean determineGameState()
+	public boolean determineGameState()		//determines game state and returns it
 	{
 		if(p.playerWinOrLose())
 			return true;
@@ -113,7 +113,7 @@ public class Game
 			return false;
 	}
 	
-	public boolean playerBustCheck()
+	public boolean playerBustCheck()		//checks if the player busted or went over 21
 	{
 		int playerValue = p.getPlayerHandValue();
 		
@@ -130,20 +130,21 @@ public class Game
 	
 	public int getPlayerAccountBalance()
 	{
-		return p.getPlayerAccountBalance();
+		return p.getPlayerAccountBalance();		//returns the current balance in the players account
 	}
 	
 	public int getPotValue()
 	{
-		return potValue;
+		return potValue;		//returns pot value which is both how much the dealer bet and the player (which are both the same)
 	}
 	
 	public boolean dealerReveal()
 	{	
+		//dealer reveals the flipped down card
 		if(p.checkBlackJack() == true)
 		{
-			//de.showHand(true);
-			dealerTurn();
+			//de.showHand(true);	
+			dealerTurn();		
 			return true;
 		}
 		else
@@ -158,7 +159,7 @@ public class Game
 	public boolean dealerTurn()
 	{
 		boolean hitOnce = false;
-		
+									 	//checks if dealer must hit, if so they get a card dealed to them
 		while (de.mustHit())
 		{
 			//print message the dealer decided to hit!
@@ -182,7 +183,7 @@ public class Game
 		
 		if(dVal <= 21)
 		{
-			if(pVal > dVal)
+			if(pVal > dVal)		//player has higher than dealer
 			{
 				//player won
 				result = "player won";
@@ -190,7 +191,7 @@ public class Game
 				amountInsured = 0;
 			}
 			
-			else if(pVal < dVal)
+			else if(pVal < dVal)		//player has lower than dealer 
 			{
 				//player lost
 				result = "dealer won";
@@ -206,15 +207,14 @@ public class Game
 				p.returnWinnings(amountBet);
 			}
 		}
-		else
+		else 				//dealer has more than 21, causing them to bust, the player automatically winning
 		{
 			result = "player won";
 			p.returnWinnings(potValue);
 			amountInsured = 0;
 		}
 		
-		/* TODO Resetting potValue here messes up the message that says player has Won. */
-		//potValue = 0;
+		
 		
 		return result;
 		
@@ -227,7 +227,7 @@ public class Game
 	
 	public boolean finalProblem()
 	{
-		if(p.getPlayerAccountBalance() == 0)
+		if(p.getPlayerAccountBalance() < 5000)		//checks if the account has less than 5000 which is the minimum betting amount causing the player to lose and do their punishment problem
 		{
 			return true;
 		}
@@ -238,7 +238,7 @@ public class Game
 	public void render(Graphics g, JPanel panel, boolean hideIn)
 	{
 		boolean hide = hideIn;
-		
+		//renders hands by calling the render hands in dealer and player 
 		de.renderHand(g,panel,hide);
 		p.renderHand(g,panel);
 		
@@ -257,7 +257,7 @@ public class Game
 		de.resetHand();
 	}
 	
-	public void showCards()
+	public void showCards()			//prints cards (used for testing)
 	{
 		System.out.println("Player Cards");
 		//p.showHand();
