@@ -4,8 +4,8 @@ import java.awt.*;
 
 public class Dealer
 {
-	Card[] dealerHand;
-	public int numCards;
+	Card[] dealerHand;		//dealer hand, array of Cards
+	public int numCards;	//number of cards 
 	
 	//dealer must hit if both cards revealed are 16 or less and must stand if the total is 17 or more
 	public Dealer()
@@ -16,9 +16,9 @@ public class Dealer
 	
 	public void dealCard(Card c)
 	{
-		dealerHand[numCards] = c;
+		dealerHand[numCards] = c;		//deals a card and adds it to the array
 		System.out.println(dealerHand[numCards].show() + " Dealer cards");
-		numCards++;
+		numCards++;		//increments the number of cards
 	}
 	
 	/* Discard all cards from hand */
@@ -29,7 +29,7 @@ public class Dealer
 	
 	public String showHand(int i)
 	{
-		String card = dealerHand[i].show();
+		String card = dealerHand[i].show();				
 		
 		return card;
 	}
@@ -38,7 +38,7 @@ public class Dealer
 	/* Returns True if the Hand is empty and false otherwise */
 	public boolean isHandEmpty()
 	{
-		return (numCards == 0);
+		return (numCards == 0);		
 	}
 	
 	/* Check if the dealer must hit */
