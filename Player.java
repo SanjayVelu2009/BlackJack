@@ -75,6 +75,7 @@ public class Player
 	public void returnWinnings(int amt)
 	{
 		currentBalance += amt;
+		System.out.println(currentBalance + "Current Balance");
 	}
 	
 	public boolean checkBlackJack()
@@ -134,5 +135,10 @@ public class Player
 	public int getPlayerAccountBalance()
 	{
 		return currentBalance;
+	}
+	
+	public String getPlayerName()
+	{
+		return name;
 	}
 }
